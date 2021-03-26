@@ -4,6 +4,9 @@ from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Input, Conv2D
 from tensorflow.keras.models import load_model, Model, Sequential
 
 
+# see here for already built-in pretrained architectures:
+# https://keras.io/api/applications/
+
 def get_arch(MODEL_ARCH, instance_size, num_classes):
 
 	# basic
@@ -29,8 +32,9 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
 	elif MODEL_ARCH == 2:
 	    # InceptionV3 (typical example arch)
 	    some_input = Input(shape=instance_size)
-	    base_model = InceptionV3(include_top=False, weights=None, pooling="max", input_tensor=some_input)
+	    base_model = InceptionV3(include_top=False, weights="imagenet", pooling=None, input_tensor=some_input)
 	    x = base_model.output
+	    x = Flatten()(x)
 	    x = Dense(64)(x)
 	    x = BatchNormalization()(x)
 	    x = Dropout(0.5)(x)
