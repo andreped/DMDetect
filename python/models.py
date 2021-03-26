@@ -1,3 +1,45 @@
 import tensorflow as tf
-from tensorflow.python.keras.models import Sequential
-from tensorflow.python.keras.layers import Conv2D, MaxPooling2D, Dropout, Flatten, Dense
+from tensorflow.keras.applications import InceptionV3
+from tensorflow.keras.layers import GlobalAveragePooling2D, Dense, Input, Conv2D, Dropout, Flatten, MaxPooling2D, BatchNormalization, Activation
+from tensorflow.keras.models import load_model, Model, Sequential
+
+
+def get_arch(MODEL_ARCH, instance_size, num_classes):
+
+	# basic
+	if MODEL_ARCH == 1:
+	    # define model
+	    model = Sequential()  # example of creation of TF-Keras model using the Sequential
+	    model.add(Conv2D(32, kernel_size=(3, 3),
+	                     activation='relu',
+	                     input_shape=instance_size))
+	    model.add(BatchNormalization())
+	    model.add(Conv2D(64, (3, 3)))
+	    model.add(BatchNormalization())
+	    model.add(Activation('relu'))
+	    model.add(MaxPooling2D(pool_size=(2, 2)))
+	    model.add(Dropout(0.25))
+	    model.add(Flatten())
+	    model.add(Dense(64))
+	    model.add(BatchNormalization())
+	    model.add(Dropout(0.5))
+	    model.add(Activation('relu'))
+	    model.add(Dense(num_classes, activation='softmax'))
+
+	elif MODEL_ARCH == 2:
+	    # InceptionV3 (typical example arch)
+	    some_input = Input(shape=instance_size)
+	    base_model = InceptionV3(include_top=False, weights=None, pooling="max", input_tensor=some_input)
+	    x = base_model.output
+	    x = Dense(64)(x)
+	    x = BatchNormalization()(x)
+	    x = Dropout(0.5)(x)
+	    x = Activation('relu')(x)
+	    x = Dense(num_classes, activation='softmax')(x) 
+	    model = Model(inputs=base_model.input, outputs=x)  # example of creation of TF-Keras model using the functional API
+
+	else:
+	    print("please choose supported models: {0, 1}")
+	    exit()
+
+	return model
