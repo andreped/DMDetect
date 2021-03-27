@@ -36,11 +36,12 @@ From this image, it seems like the model is reacting on the right part of the im
 - [x] Make end-to-end pipeline for automatic DM assessment
 - [x] Achieve satisfactory classification performance
 - [x] Introduce XAI-based method to further assess classifier
+- [x] Test MTL design on the multi-classification tasks
+- [x] Made proper support for MIL classifiers, that works both during training and inference 
 - [ ] Get access to raw DM images, and test the pipeline across the full image (model trained on patches)
 - [ ] Fix data augmentation scheme in the get_dataset method
 - [ ] Extract the distrbution between the 5 classes, to be used for balancing classes during training
 - [ ] Introduce ROC-curves and AUC as additional metric for evaluating performance
-- [ ] Test MTL design on the multi-classification tasks
 - [ ] Make simple script for plotting losses and metrics as a function of epochs, using the CSV history
 
 ### Small tips
