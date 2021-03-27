@@ -17,12 +17,20 @@ from utils import flatten_
 # whether or not to use GPU for training (-1 == no GPU, else GPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # set to 0 to use GPU
 
+# allow growth, only use the GPU memory required to solve a specific task (makes room for doing stuff in parallel)
+physical_devices = tf.config.list_physical_devices('GPU')
+try:
+	tf.config.experimental.set_memory_growth(physical_devices[0], True)
+except:
+	# Invalid device or cannot modify virtual devices once initialized.
+	pass
+
 # paths
 data_path = "C:/Users/andrp/workspace/DeepXDMDetect/data/DDSM_mammography_data/"
 save_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/models/"
 history_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/history/"
 
-name = "260321_234024_classifier_model"
+name = "270321_003646_classifier_model"
 
 BATCH_SIZE = 64
 num_classes = 2
@@ -61,6 +69,9 @@ for cnt, (x_curr, y_curr) in tqdm(enumerate(test_set), total=int(N_SAMPLES / 5 /
 		ax[0].imshow(img, cmap="gray")
 		ax[1].imshow(grid, cmap="gray")
 		ax[1].set_title("Pred: " + str(pred_final[0]) + ", GT: " + str(gt_class[0]))
+		for i in range(2):
+			ax[i].axis("off")
+		plt.tight_layout()
 		plt.show()
 
 	if cnt == int(N_SAMPLES / 5 / BATCH_SIZE):
