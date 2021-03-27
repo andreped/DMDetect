@@ -87,9 +87,10 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
 
         #'''
         # https://www.tensorflow.org/tutorials/images/data_augmentation#option_2_apply_the_preprocessing_layers_to_your_dataset
+        # @ However, enabling augmentation seem to result in a memory leak (quite big one actually). Thus, should avoid using this for now.
         ds = ds.map(
                lambda image, label: (tf.image.convert_image_dtype(image, tf.float32), label)
-              ).cache(
+              ).cache(  # @TODO: Is it this cache() that produces memory leak?
               ).map(
                     lambda image, label: (tf.image.random_flip_left_right(image), label)
               ).map(

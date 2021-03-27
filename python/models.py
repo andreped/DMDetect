@@ -48,7 +48,7 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
         base_model = ResNet50(include_top=False, weights="imagenet", pooling=None, input_tensor=some_input)
         x = base_model.output
         x = Flatten()(x)
-        x = Dense(128)(x)
+        x = Dense(64)(x)
         x = BatchNormalization()(x)
         x = Dropout(0.5)(x)
         x = Activation('relu')(x)
