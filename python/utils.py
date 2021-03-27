@@ -32,3 +32,15 @@ def minmaxscale(tmp, scale_=1):
 		tmp = tmp / np.amax(tmp)
 		tmp *= scale_
 	return tmp
+
+
+# @TODO: Something wrong with this
+def random_shift(x, aug, p=0.5):
+    if  tf.random.uniform([]) < p:
+        shapes = tf.shape(x)
+        v1 = tf.cast(aug[0] * shapes[1], tf.int32)
+        v2 = tf.cast(aug[1] * shapes[2], tf.int32)
+        ha = tf.random.uniform([], minval=-5.5, maxval=5.5)
+        wa = tf.cast(tf.random.uniform([], minval=-v2, maxval=v2), tf.int32)
+        x = tfa.image.translate(x, [ha, wa], interpolation='nearest', fill_mode='constant', fill_value=0.)
+    return x

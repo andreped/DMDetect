@@ -31,16 +31,17 @@ N_TRAIN_FOLDS = 3
 N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 100
 MODEL_ARCH = 3  # which architecture/CNN to use - see models.py for info about archs
-BATCH_SIZE = 32
+BATCH_SIZE = 64
 BUFFER_SIZE = 2 ** 2
 N_TRAIN_STEPS = int(N_SAMPLES / N_TRAIN_FOLDS / BATCH_SIZE)
 N_VAL_STEPS = int(N_SAMPLES / N_VAL_FOLDS / BATCH_SIZE)
 SHUFFLE_FLAG = True
-img_size = 160
+img_size = 150
 instance_size = (img_size, img_size, 3)  # Default: (299, 299, 1). Set this to (299, 299, 1) to not downsample further.
 num_classes = 2  # [2, 5]  # if 2, then we just use the binary labels for training the model, if 5 then we train a multi-class model
 learning_rate = 1e-4  # relevant for the optimizer, Adam used by default (with default lr=1e-3), I normally use 1e-4 when finetuning
 gamma = 3  # Focal Loss parameter
+AUG_FLAG = False  # Whether or not to apply data augmentation during training (only applied to the training set)
 
 weight = 86 / 14
 
@@ -62,7 +63,7 @@ name += "bs_" + str(BATCH_SIZE) + "_arch_" + str(MODEL_ARCH) + "_imgsize_" + str
 # NOTE: We use the three first folds for training, the fourth as a validation set, and the last fold as a hold-out sample (test set)
 # get some training and validation data for building the model
 # NOTE2: Be careful appying augmentation to the validation set. Ideally it should not be necessary. However, augmenting training set is always useful!
-train_set = get_dataset(BATCH_SIZE, [data_path + "training10_" + str(i) + "/training10_" + str(i) + ".tfrecords" for i in range(3)], num_classes, SHUFFLE_FLAG, instance_size[:-1], train_mode=True)
+train_set = get_dataset(BATCH_SIZE, [data_path + "training10_" + str(i) + "/training10_" + str(i) + ".tfrecords" for i in range(3)], num_classes, SHUFFLE_FLAG, instance_size[:-1], train_mode=AUG_FLAG)
 val_set = get_dataset(BATCH_SIZE, data_path + "training10_3/training10_3.tfrecords", num_classes, SHUFFLE_FLAG, instance_size[:-1], train_mode=False)
 
 ## Model architecture (CNN)

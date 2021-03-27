@@ -3,18 +3,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental import preprocessing
 import tensorflow_addons as tfa
-
-
-# @TODO: Something wrong with this
-def random_shift(x, aug, p=0.5):
-    if  tf.random.uniform([]) < p:
-        shapes = tf.shape(x)
-        v1 = tf.cast(aug[0] * shapes[1], tf.int32)
-        v2 = tf.cast(aug[1] * shapes[2], tf.int32)
-        ha = tf.random.uniform([], minval=-5.5, maxval=5.5)
-        wa = tf.cast(tf.random.uniform([], minval=-v2, maxval=v2), tf.int32)
-        x = tfa.image.translate(x, [ha, wa], interpolation='nearest', fill_mode='constant', fill_value=0.)
-    return x
+from utils import *
 
 
 # https://towardsdatascience.com/overcoming-data-preprocessing-bottlenecks-with-tensorflow-data-service-nvidia-dali-and-other-d6321917f851
@@ -105,8 +94,8 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
                     lambda image, label: (tf.image.random_flip_left_right(image), label)
               ).map(
                     lambda image, label: (tf.image.random_flip_up_down(image), label)
-              ).map(
-                    lambda image, label: (tf.image.random_contrast(image, lower=0.0, upper=1.0), label)
+              #).map(
+              #      lambda image, label: (tf.image.random_contrast(image, lower=0.0, upper=1.0), label)
               )
         #'''
 
