@@ -7,6 +7,17 @@ For this project we have used TensorFlow 2.4. This has made it possible for us t
 ### Preliminary results
 I've trained a CNN that detects images containing breast cancer tumour tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
 
+<!-- 
+   Classes   |  Precision  |  Recall  |  F1-score  |  Support    
+-------------|-------------|----------|------------|----------
+           0 |    0.99     |   0.98   |    0.98    |   9755
+           1 |    0.88     |   0.90   |    0.89    |   1445
+-------------|-------------|----------|------------|----------
+  Accuracy   |             |          |    0.97    |  11200
+ macro avg   |    0.93     |   0.94   |    0.94    |  11200
+weighted avg |    0.97     |   0.97   |    0.97    |  11200
+--->
+
 ![Alt text](figures/performance_metrics.png)
 
 Reaching a macro-average F1 of 94% is a good start. 
