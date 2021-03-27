@@ -24,3 +24,11 @@ def flatten_(tmp):
 			out.append(t2)
 	out = np.array(out)
 	return out
+
+
+def minmaxscale(tmp, scale_=1):
+	if np.count_nonzero(tmp) > 0:
+		tmp = tmp - np.amin(tmp)
+		tmp = tmp / np.amax(tmp)
+		tmp *= scale_
+	return tmp
