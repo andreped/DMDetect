@@ -42,6 +42,30 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
 	    x = Dense(num_classes, activation='softmax')(x) 
 	    model = Model(inputs=base_model.input, outputs=x)  # example of creation of TF-Keras model using the functional API
 
+	elif MODEL_ARCH == 3:
+		# Example of a multi-task model, performing both binary classification AND multi-class classification simultaneously, distinguishing
+		# normal tissue from breast cancer tissue, as well as separating different types of breast cancer tissue
+	    some_input = Input(shape=instance_size)
+	    base_model = InceptionV3(include_top=False, weights="imagenet", pooling=None, input_tensor=some_input)
+	    x = base_model.output
+	    x = Flatten()(x)
+
+	    # first output branch
+	    y1 = Dense(64)(x)
+	    y1 = BatchNormalization()(y1)
+	    y1 = Dropout(0.5)(y1)
+	    y1 = Activation('relu')(y1)
+	    y1 = Dense(num_classes, activation='softmax')(y1) 
+
+	    # second output branch
+	    y2 = Dense(64)(x)
+	    y2 = BatchNormalization()(y2)
+	    y2 = Dropout(0.5)(y2)
+	    y2 = Activation('relu')(y2)
+	    y2 = Dense(num_classes, activation='softmax')(y2)
+
+	    model = Model(inputs=base_model.input, outputs=[y1, y2])  # example of multi-task network through the functional API
+
 	else:
 	    print("please choose supported models: {0, 1}")
 	    exit()

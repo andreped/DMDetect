@@ -5,7 +5,7 @@ from tensorflow.keras.models import load_model
 from tqdm import tqdm
 from sklearn.metrics import classification_report, auc, roc_curve
 import matplotlib.pyplot as plt
-from tf_explain.core import GradCAM
+from tf_explain.core import GradCAM, IntegratedGradients
 import tensorflow as tf
 from utils import flatten_
 
@@ -15,7 +15,7 @@ from utils import flatten_
 
 
 # whether or not to use GPU for training (-1 == no GPU, else GPU)
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # set to 0 to use GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # set to 0 to use GPU
 
 # allow growth, only use the GPU memory required to solve a specific task (makes room for doing stuff in parallel)
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -37,7 +37,7 @@ num_classes = 2
 SHUFFLE_FLAG = False
 instance_size = (160, 160, 3)
 N_SAMPLES = 55890
-XAI_FLAG = False  # False
+XAI_FLAG = True  # False
 # th = 0.5  # threshold to use for binarizing prediction
 
 # get independent test set to evaluate trained model
@@ -59,20 +59,23 @@ for cnt, (x_curr, y_curr) in tqdm(enumerate(test_set), total=int(N_SAMPLES / 5 /
 	# if XAI_FLAG is enabled, we will use Explainable AI (XAI) to assess if a CNN is doing what it should (what is it using in the image to solve the task)
 	# NOTE: Will only display first element in batch
 	if XAI_FLAG:
-		img = tf.keras.preprocessing.image.img_to_array(x_curr[0])
-		data = ([img], None)
+		for i in range(x_curr.shape[0]):
+			if (pred_final[i] == 1):
+				img = tf.keras.preprocessing.image.img_to_array(x_curr[i])
+				data = ([img], None)
 
-		explainer = GradCAM()
-		grid = explainer.explain(data, model, class_index=pred_final[0])
+				explainer = GradCAM()
+				#explainer = IntegratedGradients()
+				grid = explainer.explain(data, model, class_index=pred_final[i])
 
-		fig, ax = plt.subplots(1, 2)
-		ax[0].imshow(img, cmap="gray")
-		ax[1].imshow(grid, cmap="gray")
-		ax[1].set_title("Pred: " + str(pred_final[0]) + ", GT: " + str(gt_class[0]))
-		for i in range(2):
-			ax[i].axis("off")
-		plt.tight_layout()
-		plt.show()
+				fig, ax = plt.subplots(1, 2)
+				ax[0].imshow(img, cmap="gray")
+				ax[1].imshow(grid, cmap="gray")
+				ax[1].set_title("Pred: " + str(pred_final[i]) + ", GT: " + str(gt_class[i]))
+				for i in range(2):
+					ax[i].axis("off")
+				plt.tight_layout()
+				plt.show()
 
 	if cnt == int(N_SAMPLES / 5 / BATCH_SIZE):
 		break
