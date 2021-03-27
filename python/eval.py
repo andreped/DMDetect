@@ -88,7 +88,3 @@ summary = classification_report(gts, preds)
 print(summary)
 
 # @TODO: Plot ROC and report AUC as additional performance metric(s)
-
-
-
-

@@ -14,20 +14,31 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
             'label_normal': tf.io.FixedLenFeature([], tf.int64),
             'image': tf.io.FixedLenFeature([], tf.string)
         }
+
         features = tf.io.parse_single_example(example_proto, image_feature_description)
         image = tf.io.decode_raw(features['image'], tf.uint8)
         image.set_shape([1 * 299 * 299])
         image = tf.reshape(image, [299, 299, 1])  # original image size is 299x299x1
         image = tf.image.grayscale_to_rgb(image)  # convert gray image to RGB image relevant for using pretrained CNNs and finetuning
         image = tf.image.resize(image, out_shape)
+
         if num_classes == 2:
-        	label = tf.cast(features['label_normal'], tf.int32)
+            label = tf.cast(features['label_normal'], tf.int32)
         elif num_classes == 5:
-        	label = tf.cast(features['label'], tf.int32)
+            label = tf.cast(features['label'], tf.int32)
+        elif (num_classes == [2, 5]):
+            label = [tf.cast(features['label_normal'], tf.int32), tf.cast(features['label'], tf.int32)]
+        elif (num_classes == [5, 2]):
+            label = [tf.cast(features['label'], tf.int32), tf.cast(features['label_normal'], tf.int32)]
         else:
-        	print("Unvalid num_classes was given. Only valid values are {2, 5}.")
-        	exit()
-        label = tf.one_hot(label, num_classes)  # create one-hotted GT compatible with softmax, also convenient for multi-class...
+            print("Unvalid num_classes was given. Only valid values are {2, 5, [2, 5], [5, 2]}.")
+            exit()
+
+        if type(label) == list:
+            label = {"cl" + str(i+1): tf.one_hot(label[i], num_classes[i]) for i in range(len(label))}
+        else:
+            label = tf.one_hot(label, num_classes)  # create one-hotted GT compatible with softmax, also convenient for multi-class... 
+        
         return image, label
 
     # blur filter
@@ -64,6 +75,6 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
     ds = ds.map(rescale, num_parallel_calls=autotune)
     # @TODO: Something wrong here 
     #if train_mode:
-    #	ds = ds.map(augment, num_parallel_calls=autotune)  # only apply augmentation in training mode
+    #   ds = ds.map(augment, num_parallel_calls=autotune)  # only apply augmentation in training mode
     ds = ds.prefetch(autotune)
     return ds
