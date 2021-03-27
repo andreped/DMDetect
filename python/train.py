@@ -89,8 +89,8 @@ save_best = ModelCheckpoint(
     save_best_only=True,  # only saves if model has improved (after each epoch)
     save_weights_only=False,
     verbose=1,
-    monitor="val_f1_score",  # default: "val_loss" (only saves model/overwrites if val_loss has decreased)
-    mode="max",
+    monitor="val_loss",  # "val_f1_score",  # default: "val_loss" (only saves model/overwrites if val_loss has decreased)
+    mode="min",  # default 'auto', but using custom losses it might be necessary to set it to 'max', as it is interpreted to be minimized by default, is unknown
 )
 
 history = CSVLogger(
