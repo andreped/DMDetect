@@ -2,6 +2,19 @@ import numpy as np
 import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental import preprocessing
+import tensorflow_addons as tfa
+
+
+# @TODO: Something wrong with this
+def random_shift(x, aug, p=0.5):
+    if  tf.random.uniform([]) < p:
+        shapes = tf.shape(x)
+        v1 = tf.cast(aug[0] * shapes[1], tf.int32)
+        v2 = tf.cast(aug[1] * shapes[2], tf.int32)
+        ha = tf.random.uniform([], minval=-5.5, maxval=5.5)
+        wa = tf.cast(tf.random.uniform([], minval=-v2, maxval=v2), tf.int32)
+        x = tfa.image.translate(x, [ha, wa], interpolation='nearest', fill_mode='constant', fill_value=0.)
+    return x
 
 
 # https://towardsdatascience.com/overcoming-data-preprocessing-bottlenecks-with-tensorflow-data-service-nvidia-dali-and-other-d6321917f851
@@ -54,11 +67,17 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
 
     # augmentation filters
     def augment(image, label):
+        '''
         data_augmentation = tf.keras.Sequential(
-           [preprocessing.RandomFlip("horizontal_and_vertical"),  # @TODO: Does both horizontal AND vertical make sense in this case?
-            preprocessing.RandomRotation(0.1),
-            preprocessing.RandomZoom(0.1)])  # Be careful doing these types of augmentations as the lesion might fall outside the image, especially for zoom and shift
+            [
+                tf.keras.layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
+                tf.keras.layers.experimental.preprocessing.RandomRotation(0.1),
+                tf.keras.layers.experimental.preprocessing.RandomZoom(0.1)  # Be careful doing these types of augmentations as the lesion might fall outside the image, especially for zoom and shift
+
+            ]
+        )  # @TODO: Does both horizontal AND vertical make sense in this case?
         image = data_augmentation(image)
+        '''
         return image, label
 
     autotune = tf.data.experimental.AUTOTUNE
@@ -74,7 +93,22 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
     ds = ds.batch(batch_size)
     ds = ds.map(rescale, num_parallel_calls=autotune)
     # @TODO: Something wrong here 
-    #if train_mode:
-    #   ds = ds.map(augment, num_parallel_calls=autotune)  # only apply augmentation in training mode
+    if train_mode:
+        #ds = ds.map(lambda image, label: (augment(image, label)), num_parallel_calls=autotune)  # only apply augmentation in training mode
+
+        #'''
+        # https://www.tensorflow.org/tutorials/images/data_augmentation#option_2_apply_the_preprocessing_layers_to_your_dataset
+        ds = ds.map(
+               lambda image, label: (tf.image.convert_image_dtype(image, tf.float32), label)
+              ).cache(
+              ).map(
+                    lambda image, label: (tf.image.random_flip_left_right(image), label)
+              ).map(
+                    lambda image, label: (tf.image.random_flip_up_down(image), label)
+              ).map(
+                    lambda image, label: (tf.image.random_contrast(image, lower=0.0, upper=1.0), label)
+              )
+        #'''
+
     ds = ds.prefetch(autotune)
     return ds

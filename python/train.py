@@ -30,15 +30,15 @@ N_SAMPLES = 55890  # https://www.kaggle.com/skooch/ddsm-mammography
 N_TRAIN_FOLDS = 3
 N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 100
-MODEL_ARCH = 4  # which architecture/CNN to use - see models.py for info about archs
-BATCH_SIZE = 64
+MODEL_ARCH = 3  # which architecture/CNN to use - see models.py for info about archs
+BATCH_SIZE = 32
 BUFFER_SIZE = 2 ** 2
 N_TRAIN_STEPS = int(N_SAMPLES / N_TRAIN_FOLDS / BATCH_SIZE)
 N_VAL_STEPS = int(N_SAMPLES / N_VAL_FOLDS / BATCH_SIZE)
 SHUFFLE_FLAG = True
 img_size = 160
 instance_size = (img_size, img_size, 3)  # Default: (299, 299, 1). Set this to (299, 299, 1) to not downsample further.
-num_classes = [2, 5]  # if 2, then we just use the binary labels for training the model, if 5 then we train a multi-class model
+num_classes = 2  # [2, 5]  # if 2, then we just use the binary labels for training the model, if 5 then we train a multi-class model
 learning_rate = 1e-4  # relevant for the optimizer, Adam used by default (with default lr=1e-3), I normally use 1e-4 when finetuning
 gamma = 3  # Focal Loss parameter
 
