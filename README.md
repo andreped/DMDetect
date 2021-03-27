@@ -35,7 +35,8 @@ From this image, it seems like the model is reacting on the right part of the im
 
 ### How to use?
 
-Given that you have structured your project as described below, and the paths are updated in the train.py and eval.py scripts, you should be ready to go.
+Given that you have created a virtual environent and installed all the requirements (see tips below), that the project is described as below, and the paths are updated in the train.py and eval.py scripts, you should be ready to go.
+
 Simply train a CNN classifier running the train.py script: 
 ```
 python train.py
