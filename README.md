@@ -1,4 +1,4 @@
-# DeepXDMDetect
+# XDMDetect
 
 Code relevant for training, evaluating, assessing and deploying CNN classifiers for DM image classification
 
@@ -50,7 +50,7 @@ python eval.py
 ### Project structure
 
 ```
-+-- {Project-name}/
++-- XDMDetect/
 |   +-- python/
 |   |   +-- create_data.py
 |   |   +-- train.py
