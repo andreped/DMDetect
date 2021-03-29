@@ -1,6 +1,6 @@
 # XDMDetect
 
-Code relevant for training, evaluating, assessing and deploying CNN classifiers for DM image classification
+Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification
 
 This code as of now, contains all necessary scripts to train and evaluate CNN image classifiers on a specific Kaggle dataset of DM images.
 For this project we have used TensorFlow 2.4. This has made it possible for us to use TFRecords, which are suitable for simple batch generation during training and inference. It is also extremely efficient.
