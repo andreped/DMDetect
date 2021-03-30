@@ -2,10 +2,9 @@
 
 Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification.
 
-This repository contains all necessary scripts to train and evaluate CNN image classifiers on a specific Kaggle dataset of DM images.
-For this project we have used TensorFlow 2.4. This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training.
-
-The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969).
+The project and code is defined is such a way that it should be able to deployed out-of-the-box, given that the project structure is defined as below.
+For instance, I have tested this both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook examples.
+For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as data augmentation using GPU.
 
 ### Preliminary results
 
@@ -34,17 +33,19 @@ To further assess the performance of the method, I used XAI to see if the method
 
 From this image, it seems like the model is reacting on the right part of the image. However, the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether can make the design more robust.
 
+### Free-to-use data set
+The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure below).
 
 ### How to use?
 
-Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) updated the paths in train.py and eval.py, you should be ready to go.
+Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) placed the uncompressed data set in the data/ folder, you should be ready to go.
 
 Simply train a CNN classifier running the train.py script: 
 ```
 python train.py
 ```
 
-When a model is ready, it can be evaluated using the eval.py script, which will return summary performance results, as well as the option to further assessing the model using XAI.
+When a model is ready (see output/models/), it can be evaluated using the eval.py script, which will return summary performance results, as well as the option to further assess the model using XAI.
 ```
 python eval.py
 ```
@@ -83,6 +84,8 @@ python eval.py
 - [x] Test MTL design on the multi-classification tasks
 - [x] Made proper support for MIL classifiers, that works both during training and inference 
 - [x] Fix data augmentation scheme in the get_dataset method
+- [x] Updated paths to be more generic
+- [x] Added Jupyter Notebook relevant for deployment on Google Colab
 - [ ] Find the optimal set of augmentation methods
 - [ ] Get access to raw DM images, and test the pipeline across the full image (model trained on patches)
 - [ ] Extract the distrbution between the 5 classes, to be used for balancing classes during training
