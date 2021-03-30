@@ -1,6 +1,6 @@
 # DMDetect
 
-Code relevant for training, evaluating, assessing and deploying Convolutional Neural Network (CNN) for Digital Mammography (DM) image classification.
+Code relevant for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for Digital Mammography (DM) image classification.
 
 The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure).
 For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
