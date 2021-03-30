@@ -1,9 +1,11 @@
 # DMDetect
 
-Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification
+Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification.
 
-This code as of now, contains all necessary scripts to train and evaluate CNN image classifiers on a specific Kaggle dataset of DM images.
-For this project we have used TensorFlow 2.4. This has made it possible for us to use TFRecords, which are suitable for simple batch generation during training and inference. It is also extremely efficient.
+This repository contains all necessary scripts to train and evaluate CNN image classifiers on a specific Kaggle dataset of DM images.
+For this project we have used TensorFlow 2.4. This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training.
+
+The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969).
 
 ### Preliminary results
 
@@ -20,22 +22,22 @@ I've trained a CNN that detects images containing breast cancer tumour tissue. W
 weighted avg |    0.97     |   0.97   |    0.97    |  11200
 --->
 
-![Alt text](figures/performance_metrics.png)
+<img src="figures/performance_metrics.png" width="50%" height="50%">
 
-Reaching a macro-average F1 of 94% is a good start. 
+Reaching a macro-average F1-score of 94% is a good start.
 
 ### Explainable AI (XAI)
 
 To further assess the performance of the method, I used XAI to see if the method is doing what it should:
 
-![Alt text](figures/XAI_example.png)
+<img src="figures/XAI_example.png" width="50%" height="50%">
 
-From this image, it seems like the model is reacting on the right part of the image. However, the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will introduce some shift augmentation tomorrow to see if it helps.
+From this image, it seems like the model is reacting on the right part of the image. However, the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether can make the design more robust.
 
 
 ### How to use?
 
-Given that you have created a virtual environent and installed all the requirements (see tips below), that the project is described as below, and the paths are updated in the train.py and eval.py scripts, you should be ready to go.
+Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) updated the paths in train.py and eval.py, you should be ready to go.
 
 Simply train a CNN classifier running the train.py script: 
 ```
@@ -50,7 +52,7 @@ python eval.py
 ### Project structure
 
 ```
-+-- XDMDetect/
++-- {DMDetect}/
 |   +-- python/
 |   |   +-- create_data.py
 |   |   +-- train.py
