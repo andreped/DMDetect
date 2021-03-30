@@ -98,7 +98,7 @@ python eval.py
 - [ ] Introduce ROC-curves and AUC as additional metric for evaluating performance
 - [ ] Make simple script for plotting losses and metrics as a function of epochs, using the CSV history
 
-### Small tips
+### Tips
 
 Make virtual environment (Not necessary):\
 `virtualenv -ppython3 venv --clear`
@@ -106,6 +106,9 @@ Make virtual environment (Not necessary):\
 Activating virtual environment:\
 On Win10: `.\venv\Scripts\activate.ps1`\
 On Linux: `source venv/bin/activate`
+
+Deactivating virtual environment:\
+`deactivate`
 
 Install dependencies from requirements file:\
 `pip install -r requirements.txt`
