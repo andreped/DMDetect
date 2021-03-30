@@ -1,4 +1,4 @@
-# XDMDetect
+# DMDetect
 
 Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification
 
