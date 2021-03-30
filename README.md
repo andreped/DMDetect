@@ -117,3 +117,7 @@ Install dependencies from requirements file:\
 
 Updating requirements.txt file:\
 `pip freeze > requirements.txt`
+
+------
+
+Made with :heart: and python
