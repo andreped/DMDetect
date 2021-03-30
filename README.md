@@ -1,6 +1,6 @@
 # DMDetect
 
-Code relevant for training, evaluating, assessing and deploying CNN classifiers for Digital Mammography (DM) image classification.
+Code relevant for training, evaluating, assessing and deploying Convolutional Neural Network (CNN) for Digital Mammography (DM) image classification.
 
 The project and code is defined is such a way that it should be able to deployed out-of-the-box, given that the project structure is defined as below.
 For instance, I have tested this both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook examples.
