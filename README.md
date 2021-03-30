@@ -2,7 +2,7 @@
 
 Code relevant for training, evaluating, assessing and deploying Convolutional Neural Network (CNN) for Digital Mammography (DM) image classification.
 
-The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as below.
+The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure).
 For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
 
 For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as GPU-accelerated data augmentation.
@@ -35,14 +35,14 @@ To further assess the performance of the method, XAI was used (in this case [Gra
 From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether one can make the current design more robust.
 
 ### Free-to-use data set
-The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure below).
+The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)).
 
 ### How to use?
 
 Given that you have: 
 1. Created a virtual environent (not necessary, but smart to do)
 2. Installed all requirements
-3. Defined the project as below
+3. Defined the project as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)
 4. Placed the uncompressed data set in the data/ folder
 
 ...you should be all set. Given that you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
