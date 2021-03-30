@@ -107,7 +107,7 @@ Activating virtual environment:\
 On Win10: `.\venv\Scripts\activate.ps1`\
 On Linux: `source venv/bin/activate`
 
-Install dependencies from requirement file:\
+Install dependencies from requirements file:\
 `pip install -r requirements.txt`
 
 Updating requirements.txt file:\
