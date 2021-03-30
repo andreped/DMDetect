@@ -4,6 +4,7 @@ Code relevant for training, evaluating, assessing and deploying CNN classifiers 
 
 The project and code is defined is such a way that it should be able to deployed out-of-the-box, given that the project structure is defined as below.
 For instance, I have tested this both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook examples.
+
 For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as data augmentation using GPU.
 
 ### Preliminary results
