@@ -12,7 +12,7 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
 
     # basic
     if MODEL_ARCH == 1:
-        # define model
+        # define model (some naive network)
         model = Sequential()  # example of creation of TF-Keras model using the Sequential
         model.add(Conv2D(32, kernel_size=(3, 3), input_shape=instance_size))
         model.add(BatchNormalization())
@@ -30,7 +30,7 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
         model.add(Dense(num_classes, activation='softmax'))
 
     elif MODEL_ARCH == 2:
-        # InceptionV3 (typical example arch)
+        # InceptionV3 (typical example arch) - personal preference for CNN classification (however, quite expensive and might be overkill in a lot of scenarios)
         some_input = Input(shape=instance_size)
         base_model = InceptionV3(include_top=False, weights="imagenet", pooling=None, input_tensor=some_input)
         x = base_model.output
@@ -80,7 +80,7 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
         model = Model(inputs=base_model.input, outputs=[y1, y2])  # example of multi-task network through the functional API
 
     else:
-        print("please choose supported models: {0, 1}")
+        print("please choose supported models: {1, 2, 3, 4}")
         exit()
 
     return model

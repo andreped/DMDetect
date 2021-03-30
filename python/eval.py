@@ -26,12 +26,12 @@ except:
 	pass
 
 # paths
-data_path = "C:/Users/andrp/workspace/DeepXDMDetect/data/DDSM_mammography_data/"
-save_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/models/"
-history_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/history/"
+data_path = "../data/DDSM_mammography_data/"
+save_path = "../output/models/"
+history_path = "../output/history/"
 
-#name = "270321_003646_classifier_model"  # binary
-name = "270321_041002_bs_64_arch_4_imgsize_160_nbcl_[2, 5]_gamma_3_classifier_model"  # MTL
+name = "270321_003646_classifier_model"  # binary
+#name = "270321_041002_bs_64_arch_4_imgsize_160_nbcl_[2, 5]_gamma_3_classifier_model"  # MTL
 
 BATCH_SIZE = 16
 num_classes = 2 #eval(name.split("nbcl_")[-1].split("_")[0])

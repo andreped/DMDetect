@@ -19,19 +19,17 @@ name = today.strftime("%d%m") + today.strftime("%Y")[2:] + "_" + today.strftime(
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # paths
-data_path = "C:/Users/andrp/workspace/DeepXDMDetect/data/DDSM_mammography_data/"
-save_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/models/"
-history_path = "C:/Users/andrp/workspace/DeepXDMDetect/output/history/"
-
-print(data_path + "training10_0/training10_0.tfrecords")
+data_path = "../data/DDSM_mammography_data/"
+save_path = "../output/models/"
+history_path = "../output/history/"
 
 # PARAMS
 N_SAMPLES = 55890  # https://www.kaggle.com/skooch/ddsm-mammography
 N_TRAIN_FOLDS = 3
 N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 100
-MODEL_ARCH = 3  # which architecture/CNN to use - see models.py for info about archs
-BATCH_SIZE = 64
+MODEL_ARCH = 2  # which architecture/CNN to use - see models.py for info about archs
+BATCH_SIZE = 128
 BUFFER_SIZE = 2 ** 2
 N_TRAIN_STEPS = int(N_SAMPLES / N_TRAIN_FOLDS / BATCH_SIZE)
 N_VAL_STEPS = int(N_SAMPLES / N_VAL_FOLDS / BATCH_SIZE)
