@@ -96,14 +96,14 @@ python eval.py
 
 Make virtual environment:
 
-> `virtualenv -ppython3 venv --clear`
+`virtualenv -ppython3 venv --clear`
 `.\venv\Scripts\activate.ps1`
 `pip install -r requirements.txt`
 
 Activating virtual environment (on Win10):
 
-> `.\venv\Scripts\activate.ps1`
+`.\venv\Scripts\activate.ps1`
 
 Updating requirements.txt file:
 
-> `pip freeze > requirements.txt`
+`pip freeze > requirements.txt`
