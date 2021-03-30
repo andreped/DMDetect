@@ -38,7 +38,7 @@ The data set used can be downloaded from [here](https://www.kaggle.com/skooch/dd
 
 ### How to use?
 
-Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) placed the uncompressed data set in the data/ folder, you should be ready to go.
+Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) placed the uncompressed data set in the data/ folder, you should be all set.
 
 Simply train a CNN classifier running the train.py script: 
 ```
