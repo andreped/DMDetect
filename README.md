@@ -38,7 +38,13 @@ The data set used can be downloaded from [here](https://www.kaggle.com/skooch/dd
 
 ### How to use?
 
-Given that you have: 1) Created a virtual environent, 2) installed all requirements, 3) defined the project as below, 4) placed the uncompressed data set in the data/ folder, you should be all set.
+Given that you have: 
+1. Created a virtual environent (not necessary, but smart to do)
+2. Installed all requirements
+3. Defined the project as below
+4. Placed the uncompressed data set in the data/ folder 
+
+...you should be all set. Given that you are using **Google Colab**, see example jupyter notebooks in notebooks/ for more information.
 
 Simply train a CNN classifier running the train.py script: 
 ```
@@ -94,16 +100,15 @@ python eval.py
 
 ### Small tips
 
-Make virtual environment:
-
+Make virtual environment (Not necessary):\
 `virtualenv -ppython3 venv --clear`
-`.\venv\Scripts\activate.ps1`
+
+Activating virtual environment:\
+On Win10: `.\venv\Scripts\activate.ps1`\
+On Linux: `source venv/bin/activate`
+
+Install dependencies from requirement file:\
 `pip install -r requirements.txt`
 
-Activating virtual environment (on Win10):
-
-`.\venv\Scripts\activate.ps1`
-
-Updating requirements.txt file:
-
+Updating requirements.txt file:\
 `pip freeze > requirements.txt`
