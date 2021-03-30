@@ -2,14 +2,14 @@
 
 Code relevant for training, evaluating, assessing and deploying Convolutional Neural Network (CNN) for Digital Mammography (DM) image classification.
 
-The project and code is defined is such a way that it should be able to deployed out-of-the-box, given that the project structure is defined as below.
-For instance, I have tested this both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook examples.
+The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as below.
+For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
 
 For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as GPU-accelerated data augmentation.
 
 ### Preliminary results
 
-I've trained a CNN that detects images containing breast cancer tumour tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
+I've trained a CNN that detects images containing breast cancer tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
 
 <!-- 
    Classes   |  Precision  |  Recall  |  F1-score  |  Support    
@@ -28,11 +28,11 @@ Reaching a macro-average F1-score of 94% is a good start.
 
 ### Explainable AI (XAI)
 
-To further assess the performance of the method, I used XAI to see if the method is doing what it should:
+To further assess the performance of the method, XAI was used (in this case [Grad-CAM](https://arxiv.org/abs/1610.02391), using this [repo](https://github.com/sicara/tf-explain)) to see if the method is doing what it should:
 
 <img src="figures/XAI_example.png" width="50%" height="50%">
 
-From this image, it seems like the model is reacting on the right part of the image. However, the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether can make the design more robust.
+From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether one can make the current design more robust.
 
 ### Free-to-use data set
 The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure below).
@@ -43,9 +43,9 @@ Given that you have:
 1. Created a virtual environent (not necessary, but smart to do)
 2. Installed all requirements
 3. Defined the project as below
-4. Placed the uncompressed data set in the data/ folder 
+4. Placed the uncompressed data set in the data/ folder
 
-...you should be all set. Given that you are using **Google Colab**, see example jupyter notebooks in notebooks/ for more information.
+...you should be all set. Given that you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
 
 Simply train a CNN classifier running the train.py script: 
 ```
@@ -98,6 +98,7 @@ python eval.py
 - [ ] Extract the distrbution between the 5 classes, to be used for balancing classes during training
 - [ ] Introduce ROC-curves and AUC as additional metric for evaluating performance
 - [ ] Make simple script for plotting losses and metrics as a function of epochs, using the CSV history
+- [ ] Add option to set arguments for training/evaluation using [argparse](https://docs.python.org/3/library/argparse.html) or similar
 
 ### Tips
 
