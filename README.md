@@ -120,4 +120,4 @@ Updating requirements.txt file:\
 
 ------
 
-Made with :heart: and python
+[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
