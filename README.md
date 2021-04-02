@@ -1,6 +1,6 @@
 # DMDetect
 
-Code relevant for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for Digital Mammography (DM) image classification.
+Code relevant for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for Digital Mammography (DM) image classification and segmentation.
 
 The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure).
 For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
@@ -93,6 +93,8 @@ python eval.py
 - [x] Fix data augmentation scheme in the get_dataset method
 - [x] Updated paths to be more generic
 - [x] Added Jupyter Notebook relevant for deployment on Google Colab
+- [x] Get access to semantically annotated data of breast cancer
+- [x] Setup full pipeline for training and evaluating segmentation models
 - [ ] Find the optimal set of augmentation methods
 - [ ] Get access to raw DM images, and test the pipeline across the full image (model trained on patches)
 - [ ] Extract the distrbution between the 5 classes, to be used for balancing classes during training
