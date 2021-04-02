@@ -6,7 +6,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, CSVLogger
 import tensorflow_addons as tfa
 from datetime import datetime
 from models import get_arch
-from create_data import get_dataset
+from batch_generator import get_dataset
 from utils import macro_accuracy
 from tensorflow.keras.optimizers import Adam
 
@@ -19,7 +19,7 @@ name = today.strftime("%d%m") + today.strftime("%Y")[2:] + "_" + today.strftime(
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # paths
-data_path = "../data/DDSM_mammography_data/"
+data_path =  #"..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
 save_path = "../output/models/"
 history_path = "../output/history/"
 

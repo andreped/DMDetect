@@ -4,101 +4,81 @@ import tensorflow as tf
 from tensorflow.keras.layers.experimental import preprocessing
 import tensorflow_addons as tfa
 from utils import *
+import h5py
+import cv2
+import imutils
+from tqdm import tqdm
+import matplotlib.pyplot as plt
 
 
-# https://towardsdatascience.com/overcoming-data-preprocessing-bottlenecks-with-tensorflow-data-service-nvidia-dali-and-other-d6321917f851
-def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299, 299), train_mode=False):
+def preprocess_segmentation_samples():
 
-    # parse TFRecord
-    def parse_image_function(example_proto):
-        image_feature_description = {
-            'label': tf.io.FixedLenFeature([], tf.int64),
-            'label_normal': tf.io.FixedLenFeature([], tf.int64),
-            'image': tf.io.FixedLenFeature([], tf.string)
-        }
+	data_path = "../data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/"
+	save_path = "../data/CSAW-S_preprocessed/"
 
-        features = tf.io.parse_single_example(example_proto, image_feature_description)
-        image = tf.io.decode_raw(features['image'], tf.uint8)
-        image.set_shape([1 * 299 * 299])
-        image = tf.reshape(image, [299, 299, 1])  # original image size is 299x299x1
-        image = tf.image.grayscale_to_rgb(image)  # convert gray image to RGB image relevant for using pretrained CNNs and finetuning
-        image = tf.image.resize(image, out_shape)
+	classes_ = [
+		"", "_axillary_lymph_nodes", "_calcifications", "_cancer",\
+		"_foreign_object", "_mammary_gland", "_nipple",\
+		"_non-mammary_tissue", "_pectoral_muscle", "_skin", "_text",\
+		"_thick_vessels", "_unclassified"
+	]
 
-        if num_classes == 2:
-            label = tf.cast(features['label_normal'], tf.int32)
-        elif num_classes == 5:
-            label = tf.cast(features['label'], tf.int32)
-        elif (num_classes == [2, 5]):
-            label = [tf.cast(features['label_normal'], tf.int32), tf.cast(features['label'], tf.int32)]
-        elif (num_classes == [5, 2]):
-            label = [tf.cast(features['label'], tf.int32), tf.cast(features['label_normal'], tf.int32)]
-        else:
-            print("Unvalid num_classes was given. Only valid values are {2, 5, [2, 5], [5, 2]}.")
-            exit()
+	id_ = "_mammary_gland"
+	scale_ = 2560 / 3328  # width / height
+	img_size = 512  # output image size (512 x 512), keep aspect ratio
 
-        if type(label) == list:
-            label = {"cl" + str(i+1): tf.one_hot(label[i], num_classes[i]) for i in range(len(label))}
-        else:
-            label = tf.one_hot(label, num_classes)  # create one-hotted GT compatible with softmax, also convenient for multi-class... 
-        
-        return image, label
+	if not os.path.exists(save_path):
+		os.makedirs(save_path)
 
-    # blur filter
-    def blur(image, label):
-        image = tfa.image.gaussian_filter2d(image=image,
-                            filter_shape=(11, 11), sigma=0.8)
-        return image, label
+	for patient in tqdm(os.listdir(data_path), "DM: "):
+		curr_path = data_path + patient + "/"
 
-    # rescale filter
-    def rescale(image, label):
-        image = preprocessing.Rescaling(1.0 / 255)(image)
-        return image, label
+		patient_save_path = save_path + patient + "/"
+		if not os.path.exists(patient_save_path):
+			os.makedirs(patient_save_path)
 
-    # augmentation filters
-    def augment(image, label):
-        '''
-        data_augmentation = tf.keras.Sequential(
-            [
-                tf.keras.layers.experimental.preprocessing.RandomFlip("horizontal_and_vertical"),
-                tf.keras.layers.experimental.preprocessing.RandomRotation(0.1),
-                tf.keras.layers.experimental.preprocessing.RandomZoom(0.1)  # Be careful doing these types of augmentations as the lesion might fall outside the image, especially for zoom and shift
+		# get scans in patient folder
+		scans = []
+		for file_ in os.listdir(curr_path):
+			if id_ in file_:
+				scans.append(file_.split(id_)[0])
 
-            ]
-        )  # @TODO: Does both horizontal AND vertical make sense in this case?
-        image = data_augmentation(image)
-        '''
-        return image, label
+		# for each scan in patient, extract relevant data in .h5 file
+		for scan in scans:
+			scan_id = scan.split("_")[1]
 
-    autotune = tf.data.experimental.AUTOTUNE
-    options = tf.data.Options()
-    options.experimental_deterministic = False
-    records = tf.data.Dataset.list_files(data_path, shuffle=shuffle).with_options(options)
+			with h5py.File(patient_save_path + scan_id + ".h5", "w") as f:
 
-    # load from TFRecord files
-    ds = tf.data.TFRecordDataset(records, num_parallel_reads=autotune).repeat()
-    ds = ds.map(parse_image_function, num_parallel_calls=autotune)
-    #ds = ds.map(dilate, num_parallel_calls=autotune)
-    #ds = ds.map(blur, num_parallel_calls=autotune)  # @ TODO: Should this augmentation method be mixed in with the rest of the methods? Perhaps it already exists in TF by default?
-    ds = ds.batch(batch_size)
-    ds = ds.map(rescale, num_parallel_calls=autotune)
-    # @TODO: Something wrong here 
-    if train_mode:
-        #ds = ds.map(lambda image, label: (augment(image, label)), num_parallel_calls=autotune)  # only apply augmentation in training mode
+				for class_ in classes_:
+					# read image and resize (but keep aspect ratio)
+					img = cv2.imread(curr_path + scan + class_ + ".png", 0)  # uint8
+					img = imutils.resize(img, height=img_size)  # uint8
 
-        #'''
-        # https://www.tensorflow.org/tutorials/images/data_augmentation#option_2_apply_the_preprocessing_layers_to_your_dataset
-        # @ However, enabling augmentation seem to result in a memory leak (quite big one actually). Thus, should avoid using this for now.
-        ds = ds.map(
-               lambda image, label: (tf.image.convert_image_dtype(image, tf.float32), label)
-              ).cache(  # @TODO: Is it this cache() that produces memory leak?
-              ).map(
-                    lambda image, label: (tf.image.random_flip_left_right(image), label)
-              ).map(
-                    lambda image, label: (tf.image.random_flip_up_down(image), label)
-              #).map(
-              #      lambda image, label: (tf.image.random_contrast(image, lower=0.0, upper=1.0), label)
-              )
-        #'''
+					if class_ == "":
+						class_ = "data"
 
-    ds = ds.prefetch(autotune)
-    return ds
+						# apply CLAHE for contrast enhancement
+						clahe_create = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+						img = clahe_create.apply(img)
+					else:
+						img = minmaxscale(img.astype(np.float32), scale_=1).astype(np.uint8)
+
+					if img.shape[1] < img.shape[0]:
+						tmp = np.zeros((img_size, img_size), dtype=np.uint8)
+						img_shapes = img.shape
+						tmp[:img_shapes[0], :img_shapes[1]] = img
+						img = tmp
+
+					f.create_dataset(class_, data=img, compression="gzip", compression_opts=4)
+
+
+# preprocess the data
+preprocess_segmentation_samples()
+
+
+
+
+
+
+
+

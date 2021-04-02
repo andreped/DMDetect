@@ -36,11 +36,50 @@ def minmaxscale(tmp, scale_=1):
 
 # @TODO: Something wrong with this
 def random_shift(x, aug, p=0.5):
-    if  tf.random.uniform([]) < p:
-        shapes = tf.shape(x)
-        v1 = tf.cast(aug[0] * shapes[1], tf.int32)
-        v2 = tf.cast(aug[1] * shapes[2], tf.int32)
-        ha = tf.random.uniform([], minval=-5.5, maxval=5.5)
-        wa = tf.cast(tf.random.uniform([], minval=-v2, maxval=v2), tf.int32)
-        x = tfa.image.translate(x, [ha, wa], interpolation='nearest', fill_mode='constant', fill_value=0.)
-    return x
+	if  tf.random.uniform([]) < p:
+		shapes = tf.shape(x)
+		v1 = tf.cast(aug[0] * shapes[1], tf.int32)
+		v2 = tf.cast(aug[1] * shapes[2], tf.int32)
+		ha = tf.random.uniform([], minval=-5.5, maxval=5.5)
+		wa = tf.cast(tf.random.uniform([], minval=-v2, maxval=v2), tf.int32)
+		x = tfa.image.translate(x, [ha, wa], interpolation='nearest', fill_mode='constant', fill_value=0.)
+	return x
+
+
+def IOU(y_true, y_pred, eps=1e-15, remove_bg=True):
+	nb_classes = y_true.shape[-1]
+	iou_ = 0
+	for c in range(int(remove_bg), nb_classes):
+		y_pred_curr = y_pred[..., c]
+		y_true_curr = y_true[..., c]
+		intersection = (y_true_curr * y_pred_curr).sum()
+		union = y_true_curr.sum() + y_pred_curr.sum() - intersection
+		iou_ += (intersection + eps) / (union + eps)
+	iou_ /= (nb_classes - int(remove_bg))
+	return iou_
+
+
+def DSC(y_true, y_pred, smooth=1e-15, remove_bg=True):
+	nb_classes = int(y_true.shape[-1])
+	dice = 0
+	for c in range(int(remove_bg), nb_classes):
+		y_pred_curr = y_pred[..., c]
+		y_true_curr = y_true[..., c]
+		intersection1 = np.sum(y_pred_curr * y_true_curr)
+		union1 = np.sum(y_pred_curr * y_pred_curr) + np.sum(y_true_curr * y_true_curr)
+		dice += (2. * intersection1 + smooth) / (union1 + smooth)
+	dice /= (nb_classes - int(remove_bg))
+	return dice
+
+
+def one_hot_fix(x, nb_classes):
+	out = np.zeros(x.shape + (nb_classes,), dtype=np.int32)
+	for c in range(nb_classes):
+		out[..., c] = (x == c).astype(np.int32)
+	return out
+
+
+def argmax_keepdims(x, axis):
+	output_shape = list(x.shape)
+	output_shape[axis] = 1
+	return np.argmax(x, axis=axis).reshape(output_shape)
