@@ -9,6 +9,7 @@ from models import get_arch, Unet
 from batch_generator import get_dataset, batch_gen
 from utils import macro_accuracy, flatten_
 from tensorflow.keras.optimizers import Adam
+# from accumulated_gradients import AccumOptimizer  # @TODO: Currently, these accumulated gradients solutions are not compatible with something in TF 2
 
 
 # today's date and time
@@ -17,6 +18,18 @@ name = today.strftime("%d%m") + today.strftime("%Y")[2:] + "_" + today.strftime(
 
 # whether or not to use GPU for training (-1 == no GPU, else GPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
 
 # paths
 data_path =  "../data/CSAW-S_preprocessed/"  # "..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
@@ -29,7 +42,8 @@ N_TRAIN_FOLDS = 3
 N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 1000  # 200
 MODEL_ARCH = 2  # which architecture/CNN to use - see models.py for info about archs
-batch_size = 8  # 16
+batch_size = 12  # 16
+accum_steps = 4  # number of steps when performing accumulated gradients
 BUFFER_SIZE = 2 ** 2
 SHUFFLE_FLAG = True
 img_size = 512
@@ -94,7 +108,10 @@ network.set_convolutions([16, 32, 32, 64, 64, 128, 128, 256, 128, 128, 64, 64, 3
 model = network.create()
 print(model.summary())  # prints the full architecture
 
+#opt = AccumOptimizer(Adam(lr=learning_rate), steps_per_update=accum_steps)
+
 model.compile(
+    #optimizer=opt,
     optimizer=Adam(learning_rate),
     loss=network.get_dice_loss()
 )
