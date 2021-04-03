@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import cv2
 
 
 def macro_accuracy(y_true, y_pred):
@@ -83,3 +84,18 @@ def argmax_keepdims(x, axis):
 	output_shape = list(x.shape)
 	output_shape[axis] = 1
 	return np.argmax(x, axis=axis).reshape(output_shape)
+
+
+def post_process(x, new_shape, orig_shape, resize=True, interpolation=cv2.INTER_NEAREST, threshold=None):
+	x = x.astype(np.float32)
+	x = x[:new_shape[0], :new_shape[1]]
+	if resize:
+		new = np.zeros(orig_shape + (x.shape[-1],), dtype=np.float32)
+		for i in range(x.shape[-1]):
+			new[..., i] = cv2.resize(x[..., i], orig_shape[::-1], interpolation=interpolation)
+		if interpolation != cv2.INTER_NEAREST:
+			if threshold is not None:
+				new = (new > 0.5).astype(np.int32)
+		return new
+	else:
+		return x

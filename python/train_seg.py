@@ -19,6 +19,7 @@ name = today.strftime("%d%m") + today.strftime("%Y")[2:] + "_" + today.strftime(
 # whether or not to use GPU for training (-1 == no GPU, else GPU)
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
+'''
 gpus = tf.config.experimental.list_physical_devices('GPU')
 if gpus:
     try:
@@ -30,9 +31,10 @@ if gpus:
     except RuntimeError as e:
         # Memory growth must be set before GPUs have been initialized
         print(e)
+'''
 
 # paths
-data_path =  "../data/CSAW-S_preprocessed/"  # "..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
+data_path =  "../data/CSAW-S_preprocessed_512_True/"  # "..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
 save_path = "../output/models/"
 history_path = "../output/history/"
 
@@ -42,20 +44,22 @@ N_TRAIN_FOLDS = 3
 N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 1000  # 200
 MODEL_ARCH = 2  # which architecture/CNN to use - see models.py for info about archs
-batch_size = 12  # 16
+batch_size = 12  # 12, 16
 accum_steps = 4  # number of steps when performing accumulated gradients
 BUFFER_SIZE = 2 ** 2
 SHUFFLE_FLAG = True
-img_size = 512
+img_size = int(data_path.split("_")[-2])  # 512
 fine_tune = 1  # if set to 1, does not perform fine-tuning
 input_shape = (img_size, img_size, fine_tune)  # Default: (299, 299, 1). Set this to (299, 299, 1) to not downsample further.
 learning_rate = 1e-4  # relevant for the optimizer, Adam used by default (with default lr=1e-3), I normally use 1e-4 when finetuning
 gamma = 3  # Focal Loss parameter
 AUG_FLAG = False  # Whether or not to apply data augmentation during training (only applied to the training set)
-train_aug = {"vert": 1, "horz": 1, "rot90": 1}  # , "gamma": [0.5, 2.0]}
+train_aug = {"vert": 1, "horz": 1, "rot90": 1, "gamma": [0.5, 2.0]}
 val_aug = {}
+spatial_dropout = 0.2  # 0.1
 N_PATIENTS = 150
 train_val_split = 0.8
+use_background = True  # False  (will neglect background class if False)
 
 '''
 class_names = [
@@ -68,7 +72,7 @@ class_names = [
 
 # @FIXME: pectoral_muscle/mammary_gland has not been consistently annotated
 class_names = [
-    "_cancer", "_mammary_gland", "_pectoral_muscle", "_skin", "_thick_vessels", "_nipple",
+    "_cancer", "_mammary_gland", "_pectoral_muscle", "_skin", "_nipple",  # "_thick_vessels"
 ]
 nb_classes = len(class_names) + 1  # include background class (+1)
 
@@ -100,8 +104,8 @@ val_gen = batch_gen(val_set, batch_size, aug=val_aug, class_names=class_names, i
 
 # define model
 network = Unet(input_shape=input_shape, nb_classes=nb_classes)
-network.encoder_spatial_dropout = 0.1
-network.decoder_spatial_dropout = 0.1
+network.encoder_spatial_dropout = spatial_dropout  # attempt to remove spatial dropout to see if it improves the issue with faulty classes...
+network.decoder_spatial_dropout = spatial_dropout  #  - Spatial Dropout extremely important to get good generalization and keep model learning what it should!
 #network.set_convolutions([8, 16, 32, 32, 64, 64, 128, 256, 128, 64, 64, 32, 32, 16, 8])
 network.set_convolutions([16, 32, 32, 64, 64, 128, 128, 256, 128, 128, 64, 64, 32, 32, 16])
 
@@ -113,7 +117,7 @@ print(model.summary())  # prints the full architecture
 model.compile(
     #optimizer=opt,
     optimizer=Adam(learning_rate),
-    loss=network.get_dice_loss()
+    loss=network.get_dice_loss(use_background=use_background)
 )
 
 save_best = ModelCheckpoint(

@@ -157,6 +157,7 @@ class Unet():
         self.encoder_spatial_dropout = None
         self.decoder_spatial_dropout = None
         self.bottom_level = 4
+        self.dropout_level_threshold = 1
 
     def set_convolutions(self, convolutions):
         if len(convolutions) != self.get_depth()*2 + 1:
@@ -224,20 +225,36 @@ class Unet():
                 convolutions.append(int(nr_of_convolutions))
                 nr_of_convolutions /= 2
 
+        depth = self.get_depth()
+
+        curr_encoder_spatial_dropout = self.encoder_spatial_dropout
+        curr_decoder_spatial_dropout = self.decoder_spatial_dropout
+
         connection = {}
         i = 0
         while size % 2 == 0 and size > self.bottom_level:
-            x, connection[size] = encoder_block(x, convolutions[i], self.encoder_use_bn, self.encoder_spatial_dropout, self.dims)
+            if i < self.dropout_level_threshold:  # only apply dropout at the bottom (deep features)
+                curr_encoder_spatial_dropout = None
+            else:
+                curr_encoder_spatial_dropout = self.encoder_spatial_dropout
+            x, connection[size] = encoder_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims)
             size /= 2
             i += 1
 
-        x = convolution_block(x, convolutions[i], self.encoder_use_bn, self.encoder_spatial_dropout, self.dims)
+        x = convolution_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims)
         i += 1
 
+        steps = int(i)
+        j = 0
         while size < init_size:
+            if steps - j - 1 <= self.dropout_level_threshold:  # only apply dropout at the bottom (deep features)
+                curr_decoder_spatial_dropout = None
+            else:
+                curr_decoder_spatial_dropout = self.decoder_spatial_dropout
             size *= 2
-            x = decoder_block(x, convolutions[i], connection[size], self.decoder_use_bn, self.decoder_spatial_dropout, self.dims)
+            x = decoder_block(x, convolutions[i], connection[size], self.decoder_use_bn, curr_decoder_spatial_dropout, self.dims)
             i += 1
+            j += 1
 
         if self.dims == 2:
             x = Convolution2D(self.nb_classes, 1, activation='softmax')(x)

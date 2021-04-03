@@ -19,12 +19,17 @@ name = today.strftime("%d%m") + today.strftime("%Y")[2:] + "_" + today.strftime(
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
 
 # allow growth, only use the GPU memory required to solve a specific task (makes room for doing stuff in parallel)
-physical_devices = tf.config.list_physical_devices('GPU')
-try:
-    tf.config.experimental.set_memory_growth(physical_devices[0], True)
-except:
-    # Invalid device or cannot modify virtual devices once initialized.
-    pass
+gpus = tf.config.experimental.list_physical_devices('GPU')
+if gpus:
+    try:
+        # Currently, memory growth needs to be the same across GPUs
+        for gpu in gpus:
+            tf.config.experimental.set_memory_growth(gpu, True)
+        logical_gpus = tf.config.experimental.list_logical_devices('GPU')
+        print(len(gpus), "Physical GPUs,", len(logical_gpus), "Logical GPUs")
+    except RuntimeError as e:
+        # Memory growth must be set before GPUs have been initialized
+        print(e)
     
 # paths
 data_path =  #"..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"

@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 def preprocess_segmentation_samples():
 
 	data_path = "../data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/"
-	save_path = "../data/CSAW-S_preprocessed/"
+	save_path = "../data/CSAW-S_preprocessed"
 
 	classes_ = [
 		"", "_axillary_lymph_nodes", "_calcifications", "_cancer",\
@@ -24,8 +24,11 @@ def preprocess_segmentation_samples():
 	]
 
 	id_ = "_mammary_gland"
-	scale_ = 2560 / 3328  # width / height
+	# scale_ = 2560 / 3328  # width / height
 	img_size = 512  # output image size (512 x 512), keep aspect ratio
+	clahe_flag = False  # True
+
+	save_path += "_" + str(img_size) + "_" + str(clahe_flag) + "/"
 
 	if not os.path.exists(save_path):
 		os.makedirs(save_path)
@@ -47,29 +50,40 @@ def preprocess_segmentation_samples():
 		for scan in scans:
 			scan_id = scan.split("_")[1]
 
-			with h5py.File(patient_save_path + scan_id + ".h5", "w") as f:
+			create_save_flag = True
 
-				for class_ in classes_:
-					# read image and resize (but keep aspect ratio)
-					img = cv2.imread(curr_path + scan + class_ + ".png", 0)  # uint8
-					img = imutils.resize(img, height=img_size)  # uint8
+			for class_ in classes_:
+				# read image and resize (but keep aspect ratio)
+				img = cv2.imread(curr_path + scan + class_ + ".png", 0)  # uint8
+				orig_shape = img.shape
+				img = imutils.resize(img, height=img_size)  # uint8
+				new_shape = img.shape
 
-					if class_ == "":
-						class_ = "data"
+				if create_save_flag:
+					f = h5py.File(patient_save_path + scan_id + "_" + str(orig_shape[0]) + "_" + str(orig_shape[1]) +\
+						"_" + str(new_shape[0]) + "_" + str(new_shape[1]) + ".h5", "w")
+					create_save_flag = False
 
-						# apply CLAHE for contrast enhancement
+				if class_ == "":
+					class_ = "data"
+
+					# apply CLAHE for contrast enhancement
+					if clahe_flag:
 						clahe_create = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
 						img = clahe_create.apply(img)
-					else:
-						img = minmaxscale(img.astype(np.float32), scale_=1).astype(np.uint8)
+				else:
+					img = minmaxscale(img.astype(np.float32), scale_=1).astype(np.uint8)
 
-					if img.shape[1] < img.shape[0]:
-						tmp = np.zeros((img_size, img_size), dtype=np.uint8)
-						img_shapes = img.shape
-						tmp[:img_shapes[0], :img_shapes[1]] = img
-						img = tmp
+				if img.shape[1] < img.shape[0]:
+					tmp = np.zeros((img_size, img_size), dtype=np.uint8)
+					img_shapes = img.shape
+					tmp[:img_shapes[0], :img_shapes[1]] = img
+					img = tmp
 
-					f.create_dataset(class_, data=img, compression="gzip", compression_opts=4)
+				f.create_dataset(class_, data=img, compression="gzip", compression_opts=4)
+
+			# finally close file, when finished writing to it
+			f. close()
 
 
 # preprocess the data

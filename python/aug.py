@@ -18,7 +18,7 @@ def add_flip_horz(input_im, output):
 
 # lossless rot90 
 def add_rotation_ll(input_im, output):
-    k = random_integers(1, high=3)  # randomly choose rotation angle: +-90, +,180, +-270
+    k = np.random.random_integers(1, high=3)  # randomly choose rotation angle: +-90, +,180, +-270
 
     # rotate
     input_im = np.rot90(input_im, k)
@@ -45,7 +45,7 @@ def add_gamma(input_im, output, r_limits):
 
 def augment_numpy(x, y, aug):
 	# only apply aug if "aug" is not empty
-	if not bool(aug):
+	if bool(aug):
 		if 'vert' in aug:
 			if (np.random.random_integers(0, 1) == 1):
 				x, y = add_flip_vert(x, y)

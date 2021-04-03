@@ -110,11 +110,12 @@ def get_dataset(batch_size, data_path, num_classes, shuffle=True, out_shape=(299
 
 
 def batch_gen(file_list, batch_size, aug={}, class_names=[], input_shape=(512, 512, 1), epochs=1,
-			  mask_flag=False, fine_tune=False):
+			  mask_flag=False, fine_tune=False, inference_mode=False):
 	while True:  # <- necessary for end of training (last epoch)
 		for i in range(epochs):
 			batch = 0
 			nb_classes = len(class_names) + 1
+			class_names = np.array(class_names)
 
 			# shuffle samples for each epoch
 			np.random.shuffle(file_list)  # patients are shuffled, but chunks are after each other
@@ -133,19 +134,37 @@ def batch_gen(file_list, batch_size, aug={}, class_names=[], input_shape=(512, 5
 					output = np.concatenate(output, axis=-1)
 
 				# need to filter all classes of interest within "_mammary_gland" away from the gland class
-				if ("_mammary_gland" in class_names) and (nb_classes > 2):
-					tmp1 = output[..., np.argmax(class_names == "_mammary_gland")]
+				if ("_pectoral_muscle" in class_names) and (nb_classes > 2):
+					tmp1 = output[..., np.argmax(class_names == "_pectoral_muscle")]
 					for c in class_names:
-						if c != "_mammary_gland":
+						if c != "_pectoral_muscle":
 							tmp2 = output[..., np.argmax(class_names == c)]
-							tmp1 = np.clip(tmp1 - tmp2, a_min=0, a_max=1)
-					output[..., np.argmax(class_names == "_mammary_gland")] = tmp1
+							tmp2[tmp1 == 1] = 0
+							output[..., np.argmax(class_names == c)] = tmp2
 
 				# filter "_cancer" class away from all other relevant classes
 				if ("_cancer" in class_names) and (nb_classes > 2):
 					tmp1 = output[..., np.argmax(class_names == "_cancer")]
 					for c in class_names:
 						if c != "_cancer":
+							tmp2 = output[..., np.argmax(class_names == c)]
+							tmp2 = np.clip(tmp2 - tmp1, a_min=0, a_max=1)
+							output[..., np.argmax(class_names == c)] = tmp2
+
+				# filter "_cancer" class away from all other relevant classes
+				if ("_nipple" in class_names) and (nb_classes > 2):
+					tmp1 = output[..., np.argmax(class_names == "_nipple")]
+					for c in class_names:
+						if c != "_nipple":
+							tmp2 = output[..., np.argmax(class_names == c)]
+							tmp2 = np.clip(tmp2 - tmp1, a_min=0, a_max=1)
+							output[..., np.argmax(class_names == c)] = tmp2
+
+				# filter "_cancer" class away from all other relevant classes
+				if ("_thick_vessels" in class_names) and (nb_classes > 2):
+					tmp1 = output[..., np.argmax(class_names == "_thick_vessels")]
+					for c in class_names:
+						if c != "_thick_vessels":
 							tmp2 = output[..., np.argmax(class_names == c)]
 							tmp2 = np.clip(tmp2 - tmp1, a_min=0, a_max=1)
 							output[..., np.argmax(class_names == c)] = tmp2
@@ -173,4 +192,7 @@ def batch_gen(file_list, batch_size, aug={}, class_names=[], input_shape=(512, 5
 					input_batch = []
 					output_batch = []
 
-					yield x_, y_
+					if inference_mode:
+						yield filename, (x_, y_)
+					else:
+						yield x_, y_
