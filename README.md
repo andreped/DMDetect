@@ -137,9 +137,10 @@ python eval_seg.py
 - [x] Added Jupyter Notebook relevant for deployment on Google Colab
 - [x] Get access to semantically annotated data of breast cancer
 - [x] Setup full pipeline for training and evaluating segmentation models
-- [ ] Find the optimal set of augmentation methods
+- [x] Add Jupyter Notebook example for training segmentation models using Google Colab
+- [x] Find the optimal set of augmentation methods for both tasks
 - [ ] Get access to raw DM images, and test the pipeline across the full image (model trained on patches)
-- [ ] Extract the distrbution between the 5 classes, to be used for balancing classes during training
+- [ ] Extract the distrbution between the 5 classes (classification task), to be used for balancing classes during training
 - [ ] Introduce ROC-curves and AUC as additional metric for evaluating performance
 - [ ] Make simple script for plotting losses and metrics as a function of epochs, using the CSV history
 - [ ] Add option to set arguments for training/evaluation using [argparse](https://docs.python.org/3/library/argparse.html) or similar
