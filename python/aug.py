@@ -4,15 +4,15 @@ import cv2
 
 # vertical flip
 def add_flip_vert(input_im, output):
-    input_im = np.flip(input_im, 0)
-    output = np.flip(output, 0)
+    input_im = np.flip(input_im, axis=0)
+    output = np.flip(output, axis=0)
     return input_im, output
 
 
 # horizontal flip
 def add_flip_horz(input_im, output):
-    input_im = np.flip(input_im, 1)
-    output = np.flip(output, 1)
+    input_im = np.flip(input_im, axis=1)
+    output = np.flip(output, axis=1)
     return input_im, output
 
 

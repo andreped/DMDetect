@@ -88,11 +88,11 @@ def get_arch(MODEL_ARCH, instance_size, num_classes):
     return model
 
 
-def convolution_block_2d(x, nr_of_convolutions, use_bn=False, spatial_dropout=None):
+def convolution_block_2d(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, renorm=False):
     for i in range(2):
         x = Convolution2D(nr_of_convolutions, 3, padding='same')(x)
         if use_bn:
-            x = BatchNormalization()(x)
+            x = BatchNormalization(renorm=renorm)(x)
         x = Activation('relu')(x)
         if spatial_dropout:
             x = SpatialDropout2D(spatial_dropout)(x)
@@ -100,41 +100,41 @@ def convolution_block_2d(x, nr_of_convolutions, use_bn=False, spatial_dropout=No
     return x
 
 
-def encoder_block_2d(x, nr_of_convolutions, use_bn=False, spatial_dropout=None):
+def encoder_block_2d(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, renorm=False):
 
-    x_before_downsampling = convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout)
+    x_before_downsampling = convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout, renorm)
     x = MaxPooling2D((2, 2))(x_before_downsampling)
 
     return x, x_before_downsampling
 
 
-def decoder_block_2d(x, nr_of_convolutions, cross_over_connection=None, use_bn=False, spatial_dropout=None):
+def decoder_block_2d(x, nr_of_convolutions, cross_over_connection=None, use_bn=False, spatial_dropout=None, renorm=False):
 
     x = UpSampling2D((2, 2))(x)
     if cross_over_connection is not None:
         x = Concatenate()([cross_over_connection, x])
-    x = convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout)
+    x = convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout, renorm)
 
     return x
 
 
-def encoder_block(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, dims=2):
+def encoder_block(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, dims=2, renorm=False):
     if dims == 2:
-        return encoder_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout)
+        return encoder_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout, renorm)
     else:
         raise ValueError
 
 
-def decoder_block(x, nr_of_convolutions, cross_over_connection=None, use_bn=False, spatial_dropout=None, dims=2):
+def decoder_block(x, nr_of_convolutions, cross_over_connection=None, use_bn=False, spatial_dropout=None, dims=2, renorm=False):
     if dims == 2:
-        return decoder_block_2d(x, nr_of_convolutions, cross_over_connection, use_bn, spatial_dropout)
+        return decoder_block_2d(x, nr_of_convolutions, cross_over_connection, use_bn, spatial_dropout, renorm)
     else:
         raise ValueError
 
 
-def convolution_block(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, dims=2):
+def convolution_block(x, nr_of_convolutions, use_bn=False, spatial_dropout=None, dims=2, renorm=False):
     if dims == 2:
-        return convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout)
+        return convolution_block_2d(x, nr_of_convolutions, use_bn, spatial_dropout, renorm)
     else:
         raise ValueError
 
@@ -158,19 +158,31 @@ class Unet():
         self.decoder_spatial_dropout = None
         self.bottom_level = 4
         self.dropout_level_threshold = 1
+        self.renorm = False
 
     def set_convolutions(self, convolutions):
-        if len(convolutions) != self.get_depth()*2 + 1:
-            raise ValueError('Nr of convolutions must have length ' + str(self.get_depth()*2 + 1))
+        #if len(convolutions) != self.get_depth()*2 + 1:
+        #    raise ValueError('Nr of convolutions must have length ' + str(self.get_depth()*2 + 1))
         self.convolutions = convolutions
 
+    def set_bottom_level(self, level):
+        self.bottom_level = level
+
+    def set_renorm(self, renorm):
+        self.renorm = renorm
+
     def get_depth(self):
+        #'''
         init_size = max(self.input_shape[:-1])
         size = init_size
         depth = 0
         while size % 2 == 0 and size > self.bottom_level:
             size /= 2
             depth += 1
+        #'''
+
+        # custom depth defined by the predefined convolutions
+        #depth = (len(self.convolutions) - 1) / 2
 
         return depth
 
@@ -237,11 +249,11 @@ class Unet():
                 curr_encoder_spatial_dropout = None
             else:
                 curr_encoder_spatial_dropout = self.encoder_spatial_dropout
-            x, connection[size] = encoder_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims)
+            x, connection[size] = encoder_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims, self.renorm)
             size /= 2
             i += 1
 
-        x = convolution_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims)
+        x = convolution_block(x, convolutions[i], self.encoder_use_bn, curr_encoder_spatial_dropout, self.dims, self.renorm)
         i += 1
 
         steps = int(i)
@@ -252,7 +264,7 @@ class Unet():
             else:
                 curr_decoder_spatial_dropout = self.decoder_spatial_dropout
             size *= 2
-            x = decoder_block(x, convolutions[i], connection[size], self.decoder_use_bn, curr_decoder_spatial_dropout, self.dims)
+            x = decoder_block(x, convolutions[i], connection[size], self.decoder_use_bn, curr_decoder_spatial_dropout, self.dims, self.renorm)
             i += 1
             j += 1
 

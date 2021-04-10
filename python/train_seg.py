@@ -9,6 +9,7 @@ from models import get_arch, Unet
 from batch_generator import get_dataset, batch_gen
 from utils import macro_accuracy, flatten_
 from tensorflow.keras.optimizers import Adam
+from resunetpp import *
 # from accumulated_gradients import AccumOptimizer  # @TODO: Currently, these accumulated gradients solutions are not compatible with something in TF 2
 
 
@@ -34,32 +35,29 @@ if gpus:
 '''
 
 # paths
-data_path =  "../data/CSAW-S_preprocessed_512_True/"  # "..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
+data_path =  "../data/CSAW-S_preprocessed_1024_True/"  # "..data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/" #"../data/DDSM_mammography_data/"
 save_path = "../output/models/"
 history_path = "../output/history/"
 
 # PARAMS
-N_SAMPLES = 55890  # https://www.kaggle.com/skooch/ddsm-mammography
-N_TRAIN_FOLDS = 3
-N_VAL_FOLDS = 1  # 5 folds to choose from
 N_EPOCHS = 1000  # 200
-MODEL_ARCH = 2  # which architecture/CNN to use - see models.py for info about archs
-batch_size = 12  # 12, 16
+batch_size = 2  # 12, 16
 accum_steps = 4  # number of steps when performing accumulated gradients
-BUFFER_SIZE = 2 ** 2
 SHUFFLE_FLAG = True
 img_size = int(data_path.split("_")[-2])  # 512
 fine_tune = 1  # if set to 1, does not perform fine-tuning
 input_shape = (img_size, img_size, fine_tune)  # Default: (299, 299, 1). Set this to (299, 299, 1) to not downsample further.
-learning_rate = 1e-4  # relevant for the optimizer, Adam used by default (with default lr=1e-3), I normally use 1e-4 when finetuning
+learning_rate = 1e-3  # relevant for the optimizer, Adam used by default (with default lr=1e-3), I normally use 1e-4 when finetuning
 gamma = 3  # Focal Loss parameter
 AUG_FLAG = False  # Whether or not to apply data augmentation during training (only applied to the training set)
-train_aug = {"vert": 1, "horz": 1, "rot90": 1, "gamma": [0.5, 2.0]}
+train_aug = {"horz": 1, "gamma": [0.75, 1.5]}  # {"vert": 1, "horz": 1, "rot90": 1, "gamma": [0.75, 1.5]}
 val_aug = {}
-spatial_dropout = 0.2  # 0.1
+spatial_dropout = 0.1  # 0.1
 N_PATIENTS = 150
 train_val_split = 0.8
 use_background = True  # False  (will neglect background class if False)
+model_arch = "unet"  # {"unet", "resunetpp"}
+#renorm = True  # False (whether to apply BatchReNormalization in U-Net)
 
 '''
 class_names = [
@@ -72,13 +70,20 @@ class_names = [
 
 # @FIXME: pectoral_muscle/mammary_gland has not been consistently annotated
 class_names = [
-    "_cancer", "_mammary_gland", "_pectoral_muscle", "_skin", "_nipple",  # "_thick_vessels"
+    "_cancer", "_mammary_gland", "_pectoral_muscle", "_nipple",  # "_skin", "_thick_vessels"
 ]
 nb_classes = len(class_names) + 1  # include background class (+1)
 
 # add hyperparams to name of session, to be easier to parse during eval and overall
-name += "bs_" + str(batch_size) + "_arch_" + str("unet") + "_imgsize_" + str(img_size) + "_nbcl_" + str(nb_classes) + "_gamma_" + str(gamma) + "_"
+name += "bs_" + str(batch_size) + "_arch_" + model_arch + "_img_" + str(img_size) + "_nbcl_" +\
+ str(nb_classes) + "_gamma_" + str(gamma) + "_aug_" +\
+ str(list(train_aug)).replace("'", "").replace("[", "").replace("]", "").replace(" ", "") +\
+ "_drp_" + str(spatial_dropout).replace(".", ",") 
+#+ "_renorm_" + str(renorm)
+name += "_"
 
+print("\nCurrent model run: ")
+print(name, "\n")
 
 ## create train and validation sets
 data_set = []
@@ -103,13 +108,24 @@ train_gen = batch_gen(train_set, batch_size, aug=train_aug, class_names=class_na
 val_gen = batch_gen(val_set, batch_size, aug=val_aug, class_names=class_names, input_shape=input_shape, epochs=N_EPOCHS, mask_flag=False, fine_tune=False)
 
 # define model
-network = Unet(input_shape=input_shape, nb_classes=nb_classes)
-network.encoder_spatial_dropout = spatial_dropout  # attempt to remove spatial dropout to see if it improves the issue with faulty classes...
-network.decoder_spatial_dropout = spatial_dropout  #  - Spatial Dropout extremely important to get good generalization and keep model learning what it should!
-#network.set_convolutions([8, 16, 32, 32, 64, 64, 128, 256, 128, 64, 64, 32, 32, 16, 8])
-network.set_convolutions([16, 32, 32, 64, 64, 128, 128, 256, 128, 128, 64, 64, 32, 32, 16])
-
-model = network.create()
+if model_arch == "unet":
+    network = Unet(input_shape=input_shape, nb_classes=nb_classes)
+    network.encoder_spatial_dropout = spatial_dropout  # attempt to remove spatial dropout to see if it improves the issue with faulty classes...
+    network.decoder_spatial_dropout = spatial_dropout  #  - Spatial Dropout extremely important to get good generalization and keep model learning what it should!
+    #network.set_convolutions([8, 16, 32, 32, 64, 64, 128, 256, 128, 64, 64, 32, 32, 16, 8])
+    network.set_convolutions([16, 32, 32, 64, 64, 128, 128, 256, 128, 128, 64, 64, 32, 32, 16])
+    if img_size == 1024:
+        network.set_bottom_level(8)
+    # network.set_renorm(renorm)
+    model = network.create()
+elif model_arch == "resunetpp":
+    network = ResUnetPlusPlus(input_shape=input_shape, nb_classes=nb_classes)
+    # network.set_convolutions([16, 32, 64, 128, 256, 512])  # [16, 32, 64, 128, 256]  # suitable for 256x256 input
+    network.set_convolutions([16, 32, 64, 128, 256, 512])  # attempt to make it more shallow => perhaps won't overfit so easily? Perhaps I sould just use dropout
+    model = network.create()
+else:
+    print("Unknown architecture selected. Please choose one of these: {'unet', 'resunet++'}")
+    exit()
 print(model.summary())  # prints the full architecture
 
 #opt = AccumOptimizer(Adam(lr=learning_rate), steps_per_update=accum_steps)

@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
 import cv2
+import matplotlib.pyplot as plt
+from skimage.morphology import disk, remove_small_holes, remove_small_objects, label
 
 
 def macro_accuracy(y_true, y_pred):
@@ -53,7 +55,7 @@ def IOU(y_true, y_pred, eps=1e-15, remove_bg=True):
 	for c in range(int(remove_bg), nb_classes):
 		y_pred_curr = y_pred[..., c]
 		y_true_curr = y_true[..., c]
-		intersection = (y_true_curr * y_pred_curr).sum()
+		intersection = (y_pred_curr * y_true_curr).sum()
 		union = y_true_curr.sum() + y_pred_curr.sum() - intersection
 		iou_ += (intersection + eps) / (union + eps)
 	iou_ /= (nb_classes - int(remove_bg))
@@ -99,3 +101,97 @@ def post_process(x, new_shape, orig_shape, resize=True, interpolation=cv2.INTER_
 		return new
 	else:
 		return x
+
+
+def post_process_mammary_gland(pred, all_class_names):
+	# orig classes
+	orig = pred.copy()
+
+	# fill holes in mammary gland class
+	mamma_class = pred[..., np.argmax(all_class_names == "mammary_gland")]
+	pred[..., np.argmax(all_class_names == "mammary_gland")] = remove_small_holes(mamma_class.astype(np.bool), area_threshold=int(np.round(np.prod(mamma_class.shape) / 1e3))).astype(np.float32)
+	
+	#'''
+	# need to update mammary gland class by all other classes to avoid missing actual true positives
+	tmp1 = pred[..., np.argmax(all_class_names == "mammary_gland")]
+	for c in all_class_names:
+		if c == "background":
+			continue
+		if c != "mammary_gland":
+			tmp2 = pred[..., np.argmax(all_class_names == c)]
+			tmp1[tmp2 == 1] = 0
+	pred[..., np.argmax(all_class_names == "mammary_gland")] = tmp1
+
+	# only keep largest mammary gland connected component
+	labels = label(pred[..., np.argmax(all_class_names == "mammary_gland")])
+	best = 0
+	largest_area = 0
+	for l in np.unique(labels):
+		if l == 0:
+			continue
+		area = np.sum(labels == l)
+		if area > largest_area:
+			largest_area = area
+			best = l
+	pred[..., np.argmax(all_class_names == "mammary_gland")] = (labels == best).astype(np.float32)
+
+	# fix background class
+	tmp1 = pred[..., np.argmax(all_class_names == "background")]
+	for c in all_class_names:
+		if c != "background":
+			tmp2 = pred[..., np.argmax(all_class_names == c)]
+			tmp1[tmp2 == 1] = 0
+	pred[..., np.argmax(all_class_names == "background")] = tmp1
+	#'''
+
+	# keep original cancer pred
+	pred[..., np.argmax(all_class_names == "cancer")] = orig[..., np.argmax(all_class_names == "cancer")]  # .copy() TODO: Why does this .copy() change the output?
+
+	return pred
+
+
+def random_jet_colormap(cmap="jet", nb=256):
+	colors = plt.cm.get_cmap(cmap, nb)  # choose which colormap to use
+	tmp = np.linspace(0, 1, nb)
+	np.random.shuffle(tmp)  # shuffle colors
+	newcolors = colors(tmp)
+	newcolors[0, :] = (0, 0, 0, 1)  # set first color to black
+	return plt.cm.colors.ListedColormap(newcolors)
+
+
+def make_subplots(x, y, pred, conf, img_size, all_class_names, some_cmap):
+
+		nb_classes = y.shape[-1]
+		'''
+		fig1, ax1 = plt.subplots(1, 3)
+		ax1[0].imshow(x_orig, cmap="gray")
+		ax1[1].imshow(np.argmax(pred_orig, axis=-1), cmap="jet", vmin=0, vmax=nb_classes-1)
+		ax1[2].imshow(np.argmax(y_orig, axis=-1), cmap="jet", vmin=0, vmax=nb_classes-1)
+		plt.show()
+		'''
+
+		fig, ax = plt.subplots(4, nb_classes)
+		ax[0, 0].imshow(x, cmap="gray", interpolation='none')
+		ax[0, 1].imshow(np.argmax(pred, axis=-1), cmap=some_cmap, vmin=0, vmax=nb_classes-1, interpolation='none')
+		ax[0, 2].imshow(np.argmax(y, axis=-1), cmap=some_cmap, vmin=0, vmax=nb_classes-1, interpolation='none')
+
+		for i in range(nb_classes):
+			ax[1, i].imshow(conf[..., i], cmap="gray", vmin=0, vmax=1, interpolation='none')
+			ax[2, i].imshow(pred[..., i], cmap="gray", vmin=0, vmax=1, interpolation='none')
+			ax[3, i].imshow(y[..., i], cmap="gray", vmin=0, vmax=1, interpolation='none')
+
+		for i in range(nb_classes):
+			for j in range(4):
+				ax[j, i].axis("off")
+
+		for i, cname in enumerate(all_class_names):
+			ax[-1, i].text(int(pred.shape[1] * 0.5), img_size + int(img_size * 0.1), cname, color="g", verticalalignment='center', horizontalalignment='center')
+
+		ax[0, 0].set_title('Img', color='c', rotation='vertical', x=-0.1, y=0.4)
+		ax[1, 0].set_title('Conf', color='c', rotation='vertical', x=-0.1, y=0.4)
+		ax[2, 0].set_title('Pred', color='c', rotation='vertical', x=-0.1, y=0.4)
+		ax[3, 0].set_title('GT', color='c', rotation='vertical', x=-0.1, y=0.4)
+		ax[0, 1].set_title('MC Pred', color='orange')
+		ax[0, 2].set_title('MC GT', color='orange')
+		plt.tight_layout()
+		plt.show()
