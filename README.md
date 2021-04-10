@@ -1,6 +1,7 @@
 # DMDetect
+[![license](https://img.shields.io/github/license/DAVFoundation/captain-n3m0.svg?style=flat-square)](https://github.com/DAVFoundation/captain-n3m0/blob/master/LICENSE)
 
-Code relevant for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for multi-class image classification and segmentation of Digital Mammography (DM) images.
+Open-source project for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for multi-class image classification and segmentation of Digital Mammography (DM) images.
 
 <img src="figures/DM_segmentation_figure.png" width="80%" height="80%">
 
