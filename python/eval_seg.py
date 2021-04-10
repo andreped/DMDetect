@@ -19,7 +19,7 @@ np.set_printoptions(formatter={'float': lambda x: "{0:0.6f}".format(x)})
 
 
 # whether or not to use GPU for training (-1 == no GPU, else GPU)
-os.environ["CUDA_VISIBLE_DEVICES"] = "-1"  # set to 0 to use GPU
+os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # set to 0 to use GPU
 
 # allow growth, only use the GPU memory required to solve a specific task (makes room for doing stuff in parallel)
 gpus = tf.config.experimental.list_physical_devices('GPU')
@@ -55,7 +55,7 @@ print(name)
 img_size = int(name.split("img_")[-1].split("_")[0])
 data_path += "CSAW-S_preprocessed_" + str(img_size) + "_True/"
 
-plot_flag = True  # False
+plot_flag = False  # False
 N_PATIENTS = 150
 train_val_split = 0.8
 #img_size = int(data_path.split("_")[-2])

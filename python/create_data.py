@@ -25,8 +25,8 @@ def preprocess_segmentation_samples():
 
 	id_ = "_mammary_gland"
 	# scale_ = 2560 / 3328  # width / height
-	img_size = 512  # output image size (512 x 512), keep aspect ratio
-	clahe_flag = False  # True
+	img_size = 1024  # output image size (512 x 512), keep aspect ratio
+	clahe_flag = True  # True
 
 	save_path += "_" + str(img_size) + "_" + str(clahe_flag) + "/"
 
