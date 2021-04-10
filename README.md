@@ -65,7 +65,7 @@ Given that you have:
 ...you should be all set. Given that you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
 
 #### Classification
-Simply train a CNN classifier running the train.py script: 
+In this case, we are using a Kaggle data set, which has already been preprocessed in a format which we can process on-the-fly in the batch generator. Thus, simply train a CNN classifier running the train.py script: 
 ```
 python train.py
 ```
