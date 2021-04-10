@@ -51,8 +51,13 @@ To further assess the performance of the method, XAI was used (in this case [Gra
 
 From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether one can make the current design more robust.
 
-### Free-to-use data set
-The data set used can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)).
+### Open data sets:
+
+#### Classification
+The data set used, **DDSM**, can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)).
+
+#### Segmentation
+The data set we used **CSAW-S**, can be downloaded from [here](https://zenodo.org/record/4030660#.YHGTJOgzaiN). Place the uncompress data into the data/ folder in the Project structure, such that the raw data is structured as such: data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/.
 
 ### How to use?
 
