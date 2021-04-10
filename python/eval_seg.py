@@ -10,6 +10,7 @@ import tensorflow as tf
 from utils import flatten_, DSC, IOU, argmax_keepdims, one_hot_fix, post_process, random_jet_colormap, make_subplots, post_process_mammary_gland
 from batch_generator import batch_gen
 import cv2
+from prettytable import PrettyTable, MARKDOWN
 
 
 # change print precision
@@ -54,7 +55,7 @@ print(name)
 img_size = int(name.split("img_")[-1].split("_")[0])
 data_path += "CSAW-S_preprocessed_" + str(img_size) + "_True/"
 
-plot_flag = False  # False
+plot_flag = True  # False
 N_PATIENTS = 150
 train_val_split = 0.8
 #img_size = int(data_path.split("_")[-2])
@@ -153,6 +154,17 @@ iou_ = np.array(iou_)
 dsc_classes_ = np.array(dsc_classes_)
 iou_classes_ = np.array(iou_classes_)
 
+x = PrettyTable()
+x.field_names = ["metrics"] + [x[1:].replace("_", " ") for x in class_names] + ["overall"]
+x.add_row(["DSC"] + list(np.mean(dsc_classes_, axis=0)) + [np.mean(dsc_, axis=0)])
+x.add_row(["IOU"] + list(np.mean(iou_classes_, axis=0)) + [np.mean(iou_, axis=0)])
+x.set_style(MARKDOWN)
+x.float_format = ".3"
+
+print("Print table summary of the results: ")
+print(x)
+
+exit()
 print("For the classes: ")
 print(class_names)
 print("DSC: ", np.mean(dsc_classes_, axis=0))
