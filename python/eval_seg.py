@@ -163,14 +163,3 @@ x.float_format = ".3"
 
 print("Print table summary of the results: ")
 print(x)
-
-exit()
-print("For the classes: ")
-print(class_names)
-print("DSC: ", np.mean(dsc_classes_, axis=0))
-print("IOU: ", np.mean(iou_classes_, axis=0))
-print("Overall (DSC and IOU): ", np.mean(dsc_, axis=0), np.mean(iou_, axis=0))
-
-# get summary statistics (performance metrics)
-#summary = classification_report(ps, gs)
-#print(summary)
