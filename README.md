@@ -1,7 +1,5 @@
 # DMDetect
 [![license](https://img.shields.io/github/license/DAVFoundation/captain-n3m0.svg?style=flat-square)](https://github.com/DAVFoundation/captain-n3m0/blob/master/LICENSE)
-[![HitCount](http://hits.dwyl.com/{andreped}/{DMDetect}.svg)](http://hits.dwyl.com/{andreped}/{DMDetect})
-
 
 Open-source project for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for multi-class image classification and segmentation of Digital Mammography (DM) images.
 
@@ -31,6 +29,9 @@ Due to the downsampling of images, too much information is lost to produce satis
 I've trained a CNN that detects images containing breast cancer tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
 
 <!-- 
+
+[![HitCount](http://hits.dwyl.com/{andreped}/{DMDetect}.svg)](http://hits.dwyl.com/{andreped}/{DMDetect})
+
    Classes   |  Precision  |  Recall  |  F1-score  |  Support    
 -------------|-------------|----------|------------|----------
            0 |    0.99     |   0.98   |    0.98    |   9755
