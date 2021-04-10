@@ -2,12 +2,28 @@
 
 Code relevant for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for multi-class image classification and segmentation of Digital Mammography (DM) images.
 
+<img src="figures/DM_segmentation_figure.png" width="80%" height="80%">
+
 The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure).
 For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
 
 For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as GPU-accelerated data augmentation.
 
 ### Preliminary results
+
+#### Segmentation
+
+I've trained a ResU-Net++ model, inputting images of 1024x1024 (preserved aspect ratio, vertical axis as reference). The model is trained to perform multi-class semantic segmentation of cancer, mammary gland, pectoral muscle and nipple:
+
+| metrics | cancer | mammary gland | pectoral muscle | nipple | overall |
+|---------|--------|---------------|-----------------|--------|---------|
+|   DSC   | 0.279  |     0.976     |      0.946      | 0.474  |  0.669  |
+|   IOU   | 0.220  |     0.955     |      0.920      | 0.373  |  0.617  |
+
+Due to the downsampling of images, too much information is lost to produce satisfactory tumour segmentation (in terms on DSC/IOU). Improvements can be made by working patch-wise, working with full or higher resolution, but it might degrade performance on other classes, so it depends on the use case.
+
+
+#### Classification
 
 I've trained a CNN that detects images containing breast cancer tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
 
