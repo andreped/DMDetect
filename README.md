@@ -63,6 +63,7 @@ Given that you have:
 
 ...you should be all set. Given that you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
 
+#### Classification
 Simply train a CNN classifier running the train.py script: 
 ```
 python train.py
@@ -71,6 +72,22 @@ python train.py
 When a model is ready (see output/models/), it can be evaluated using the eval.py script, which will return summary performance results, as well as the option to further assess the model using XAI.
 ```
 python eval.py
+```
+
+#### Segmentation
+As the data is not preprocessed, it is necessary to do that first:
+```
+python create_data.py
+```
+
+Then simply train a deep segmentation model running:
+```
+python train_seg.py
+```
+
+To evaluate the model, as well as the option to view results, run:
+```
+python eval_seg.py
 ```
 
 ### Project structure
