@@ -52,7 +52,7 @@ To further assess the performance of the method, XAI was used (in this case [Gra
 
 <img src="figures/XAI_example.png" width="50%" height="50%">
 
-From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal. I will experiment with different data augmentation designs to assess whether one can make the current design more robust.
+From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal.
 
 ### Open data sets:
 
@@ -60,7 +60,7 @@ From this figure, it seems like the model is reacting on the correct part of the
 The data set used, **DDSM**, can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)).
 
 #### Segmentation
-The data set we used **CSAW-S**, can be downloaded from [here](https://zenodo.org/record/4030660#.YHGTJOgzaiN). Place the uncompress data into the data/ folder in the Project structure, such that the raw data is structured as such: data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/.
+The data set we used, **CSAW-S**, can be downloaded from [here](https://zenodo.org/record/4030660#.YHGTJOgzaiN). Place the uncompressed data into the data/ folder in the Project structure, such that the raw data is structured as such: data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/.
 
 ### How to use?
 
@@ -70,10 +70,10 @@ Given that you have:
 3. Defined the project as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)
 4. Placed the uncompressed data set in the data/ folder
 
-...you should be all set. Given that you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
+...you should be all set. If you are using **Google Colab**, see jupyter notebook examples in notebooks/ for more information.
 
 #### Classification
-In this case, we are using a [DDSM Kaggle data set](https://www.kaggle.com/skooch/ddsm-mammography), which has already been preprocessed in a format which we can process on-the-fly in the batch generator. Thus, simply train a CNN classifier running the train.py script: 
+In this case, we are using the [DDSM Kaggle data set](https://www.kaggle.com/skooch/ddsm-mammography), which has already been preprocessed in a format which can be processed on-the-fly in the batch generator. Thus, simply train a CNN classifier running the train.py script: 
 ```
 python train.py
 ```
