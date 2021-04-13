@@ -84,7 +84,7 @@ python eval.py
 ```
 
 #### Segmentation
-As the data is not preprocessed, it is necessary to do that first:
+In this case, we are using the [CSAW-S](https://zenodo.org/record/4030660#.YHGTJOgzaiN) data set. As the data is not preprocessed, it is necessary to do that first:
 ```
 python create_data.py
 ```
@@ -112,6 +112,8 @@ python eval_seg.py
 |   |   |   +-- fold_name0/
 |   |   |   +-- fold_name1/
 |   |   |   +-- [...]
+|   |   +-- folder_containing_csaw-s_dataset/
+|   |   |   +-- [...]
 |   +-- output/
 |   |   +-- history/
 |   |   |   +--- history_some_run_name1.txt
