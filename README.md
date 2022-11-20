@@ -10,7 +10,7 @@ For instance, I have tested the project both on a local Win10 machine and using 
 
 For this project we have used TensorFlow 2.4 (with CUDA 11). This enabled us to experiment with TFRecords and tf.data.Dataset, which is suitable for efficient batch generation during training, as well as GPU-accelerated data augmentation.
 
-### Preliminary results
+## Preliminary results
 
 #### Segmentation
 
@@ -46,7 +46,7 @@ weighted avg |    0.97     |   0.97   |    0.97    |  11200
 
 Reaching a macro-average F1-score of 94% is a good start.
 
-### Explainable AI (XAI)
+## Explainable AI (XAI)
 
 To further assess the performance of the method, XAI was used (in this case [Grad-CAM](https://arxiv.org/abs/1610.02391), using this [repo](https://github.com/sicara/tf-explain)) to see if the method is doing what it should:
 
@@ -54,7 +54,7 @@ To further assess the performance of the method, XAI was used (in this case [Gra
 
 From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal.
 
-### Open data sets:
+## Open data sets:
 
 #### Classification
 The data set used, **DDSM**, can be downloaded from [here](https://www.kaggle.com/skooch/ddsm-mammography/discussion/225969). When downloaded, uncompress and place the folder structure in the data/ folder (see Project structure [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure)).
@@ -62,7 +62,7 @@ The data set used, **DDSM**, can be downloaded from [here](https://www.kaggle.co
 #### Segmentation
 The data set we used, **CSAW-S**, can be downloaded from [here](https://zenodo.org/record/4030660#.YHGTJOgzaiN). Place the uncompressed data into the data/ folder in the Project structure, such that the raw data is structured as such: data/CSAW-S/CSAW-S/CsawS/anonymized_dataset/.
 
-### How to use?
+## How to use?
 
 Given that you have: 
 1. Created a virtual environent (not necessary, but smart to do)
@@ -99,7 +99,7 @@ To evaluate the model, as well as the option to view results, run:
 python eval_seg.py
 ```
 
-### Project structure
+## Project structure
 
 ```
 +-- {DMDetect}/
@@ -125,7 +125,7 @@ python eval_seg.py
 |   |   |   +--- [...]
 ```
 
-### TODOs (most important from top to bottom):
+## TODOs (most important from top to bottom):
 
 - [x] Setup batch generation through TFRecords for GPU-accelerated generation and data augmentation
 - [x] Introduce smart losses and metrics for handling class-imbalance 
@@ -147,7 +147,7 @@ python eval_seg.py
 - [ ] Make simple script for plotting losses and metrics as a function of epochs, using the CSV history
 - [ ] Add option to set arguments for training/evaluation using [argparse](https://docs.python.org/3/library/argparse.html) or similar
 
-### Tips
+## Tips
 
 Make virtual environment (Not necessary):\
 `virtualenv -ppython3 venv --clear`
