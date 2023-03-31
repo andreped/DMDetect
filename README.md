@@ -46,7 +46,7 @@ Reaching a macro-average F1-score of 0.94 is a good start.
 To further assess the performance of the method, XAI was used (in this case [Grad-CAM](https://arxiv.org/abs/1610.02391), using this [repo](https://github.com/sicara/tf-explain)) to see if the method is doing what it should:
 
 <p align="center">
-  <img src="figures/XAI_example.png" width="50%" height="50%">
+  <img src="figures/XAI_example.png" width="70%" height="70%">
 </p>
 
 From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal.
