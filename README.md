@@ -3,7 +3,9 @@
 
 Open-source project for training, evaluating, assessing and deploying Convolutional Neural Networks (CNNs) for multi-class image classification and segmentation of Digital Mammography (DM) images.
 
-<img src="figures/DM_segmentation_figure.png" width="80%" height="80%">
+<p align="center">
+  <img src="figures/DM_segmentation_figure.png" width="80%" height="80%">
+</p>
 
 The project and code is defined such that it should be easy to use out-of-the-box, given that the project structure is defined as [below](https://github.com/andreped/DMDetect/blob/main/README.md#project-structure).
 For instance, I have tested the project both on a local Win10 machine and using Google Colab without any issues, see notebooks/ for jupyter notebook example(s).
@@ -28,21 +30,14 @@ Due to the downsampling of images, too much information is lost to produce satis
 
 I've trained a CNN that detects images containing breast cancer tissue. We get quite good results, without really tuning the network or training for long. A summary of the results can be seen below:
 
-<!-- 
-
-[![HitCount](http://hits.dwyl.com/{andreped}/{DMDetect}.svg)](http://hits.dwyl.com/{andreped}/{DMDetect})
-
-   Classes   |  Precision  |  Recall  |  F1-score  |  Support    
--------------|-------------|----------|------------|----------
-           0 |    0.99     |   0.98   |    0.98    |   9755
-           1 |    0.88     |   0.90   |    0.89    |   1445
--------------|-------------|----------|------------|----------
-  Accuracy   |             |          |    0.97    |  11200
- macro avg   |    0.93     |   0.94   |    0.94    |  11200
-weighted avg |    0.97     |   0.97   |    0.97    |  11200
---->
-
-<img src="figures/performance_metrics.png" width="50%" height="50%">
+|    Classes   |  Precision  |  Recall  |  F1-score  |  Support |   
+| -------------|-------------|----------|------------|----------|
+|            0 |    0.99     |   0.98   |    0.98    |   9755   |
+|            1 |    0.88     |   0.90   |    0.89    |   1445   |
+|              |             |          |            |          |
+|   Accuracy   |             |          |    0.97    |  11200   |
+|  macro avg   |    0.93     |   0.94   |    0.94    |  11200   |
+| weighted avg |    0.97     |   0.97   |    0.97    |  11200   |
 
 Reaching a macro-average F1-score of 94% is a good start.
 
@@ -50,7 +45,9 @@ Reaching a macro-average F1-score of 94% is a good start.
 
 To further assess the performance of the method, XAI was used (in this case [Grad-CAM](https://arxiv.org/abs/1610.02391), using this [repo](https://github.com/sicara/tf-explain)) to see if the method is doing what it should:
 
-<img src="figures/XAI_example.png" width="50%" height="50%">
+<p align="center">
+  <img src="figures/XAI_example.png" width="50%" height="50%">
+</p>
 
 From this figure, it seems like the model is reacting on the correct part of the image. However, overall the network seems biased towards "always" using the central part of the image, at least as a default, if nothing else is found. This might be suboptimal.
 
