@@ -39,7 +39,7 @@ I've trained a CNN that detects images containing breast cancer tissue. We get q
 |  macro avg   |    0.93     |   0.94   |    0.94    |  11200   |
 | weighted avg |    0.97     |   0.97   |    0.97    |  11200   |
 
-Reaching a macro-average F1-score of 94% is a good start.
+Reaching a macro-average F1-score of 0.94 is a good start.
 
 ## Explainable AI (XAI)
 
